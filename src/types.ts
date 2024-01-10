@@ -5,6 +5,7 @@ declare global {
       notionToken: string;
       dataBaseId: string;
       mistralToken: string;
+      telegramBotToken: string;
     }
   }
 }
@@ -33,52 +34,49 @@ export type NotionRes = {
   url: string;
   public_url: null | string;
 };
+export type NotionProps = Record<'رمز المنتج', NotionSelect> &
+  Record<'minutes', NotionFormula<FormuaTypeNumber>> &
+  Record<'الصفحات', NotionNumber> &
+  Record<'NO-PARTNER', NotionRelation> &
+  Record<'الشريك', NotionFormula<FormuaTypeString>> &
+  Record<'سعر يدوي', NotionNumber> &
+  Record<'metric', NotionFormula<FormuaTypeString>> &
+  Record<'شرح الرمز', NotionFormula<FormuaTypeString>> &
+  Record<'تاريخ الاستلام', NotionDate> &
+  Record<'دليل استعمال الجدول', NotionFormula<FormuaTypeString>> &
+  Record<'المجموع', NotionFormula<FormuaTypeNumber>> &
+  Record<'KMK-PRICING', NotionRelation> &
+  Record<'العميل', NotionSelect> &
+  Record<'المدة', NotionText> &
+  Record<'seconds', NotionFormula<FormuaTypeNumber>> &
+  Record<'QYAM-PRICING', NotionRelation> &
+  Record<'Created time', NotionCreateTime> &
+  Record<'Created by', NotionCreatedBy> &
+  Record<'الموظف المنتج', NotionSelect> &
+  Record<'السعر', NotionFormula<FormuaTypeNumber>> &
+  Record<'العدد', NotionNumber> &
+  Record<'النوع', NotionFormula<FormuaTypeString>> &
+  Record<'الوصف', NotionTitle> &
+  Record<'رابط المنتج', NotionUrl>;
 
-export type NotionProps =
-  & Record<'رمز المنتج', NotionSelect>
-  & Record<'minutes', NotionFormula<FormuaTypeNumber>>
-  & Record<'الصفحات', NotionNumber>
-  & Record<'NO-PARTNER', NotionRelation>
-  & Record<'الشريك', NotionFormula<FormuaTypeString>>
-  & Record<'سعر يدوي', NotionNumber>
-  & Record<'metric', NotionFormula<FormuaTypeString>>
-  & Record<'شرح الرمز', NotionFormula<FormuaTypeString>>
-  & Record<'تاريخ الاستلام', NotionDate>
-  & Record<'دليل استعمال الجدول',NotionFormula<FormuaTypeString>>
-  & Record<'المجموع', NotionFormula<FormuaTypeNumber>>
-  & Record<'KMK-PRICING', NotionRelation>
-  & Record<'العميل', NotionSelect>
-  & Record<'المدة', NotionText>
-  & Record<'seconds', NotionFormula<FormuaTypeNumber>>
-  & Record<'QYAM-PRICING', NotionRelation>
-  & Record<'Created time', NotionCreateTime>
-  & Record<'Created by', NotionCreatedBy>
-  & Record<'الموظف المنتج', NotionSelect>
-  & Record<'السعر', NotionFormula<FormuaTypeNumber>>
-  & Record<'العدد', NotionNumber>
-  & Record<'النوع', NotionFormula<FormuaTypeString>>
-  & Record<'الوصف', NotionTitle>
-  & Record<'رابط المنتج', NotionUrl>
-  
-  
 export type RestructuredData = {
   productCode: string;
   codeDescription: string;
   date: string;
-  minutes: number ;
+  minutes: number;
   partner: string;
   itemTitle: string;
   itemType: string;
   cient: string;
   itemCount: number | null;
-  pageCount: number ;
+  pageCount: number;
   employee: string;
   manualPrice: number | null;
   autoPrice: number | null;
   totalPrice: number | null;
   productURL: string;
-}
-  
+};
+
 // type NotionProps = Record<
 //   NotionPropKeys,
 //   | NotionSelect

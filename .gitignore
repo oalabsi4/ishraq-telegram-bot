@@ -37,3 +37,4 @@ bundle
 installer
 
 .env
+exported_data

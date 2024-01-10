@@ -7,12 +7,20 @@
         "LASTEXITCODE",
         "makensis",
         "MSYS",
+        "notionhq",
         "NSIS",
         "outfile",
         "PATHEXT",
         "pwsh",
         "SETLOCAL",
         "tspaths",
-        "winget"
-    ]
+        "winget",
+        "الرمز",
+        "العميل",
+        "المنتج",
+        "الموظف",
+        "النوع",
+        "تاريخ"
+    ],
+    "CodeGPT.Autocomplete.provider": "Ollama - codellama"
 }

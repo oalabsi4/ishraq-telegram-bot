@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
-import gradient from 'gradient-string';
 import env from 'dotenv';
-import { fetchNotionData } from './api/notion.js';
-import { RestructuredData } from './types.js';
+import gradient from 'gradient-string';
+import { telegram } from './api/telegram.js';
 env.config();
 // ? 👇 title text gradient colors. for more colors see: `https://cssgradient.io/gradient-backgrounds`
 const coolGradient = gradient([
@@ -33,52 +32,9 @@ console.log(
 // .strict();
 
 async function app() {
-  // await mistral('tel me a joke')
-  // const Loading = progress('Fetching data from Notion database ...');
-  let notionData: RestructuredData[];
-  try {
-    const rows = await fetchNotionData();
-    notionData = rows.map(e => ({
-      productCode: e.properties['رمز المنتج'].select.name,
-      codeDescription: e.properties['شرح الرمز'].formula.string,
-      date: e.properties['تاريخ الاستلام'].date.start,
-      minutes: e.properties.minutes.formula.number || 0,
-      partner: e.properties['الشريك'].formula.string,
-      itemTitle: e.properties['الوصف'].title[0].plain_text,
-      itemType: e.properties['النوع'].formula.string,
-      cient: e.properties['العميل'].select.name,
-      itemCount: e.properties['العدد'].number,
-      pageCount: e.properties['الصفحات'].number || 0,
-      employee: e.properties['الموظف المنتج'].select.name,
-      manualPrice: e.properties['سعر يدوي'].number,
-      autoPrice: e.properties['السعر'].formula.number,
-      totalPrice: e.properties['المجموع'].formula.number,
-      productURL: e.properties['رابط المنتج'].url,
-    }));
+   await telegram()
 
-    console.log(notionData);
-  } catch (error) {
-    // Loading.error('ERROR: fetching data from notion');
-    console.log(error);
-    process.exit(1);
-  }
-
-  // Loading.stop();
-
-  // const looping = true;
-
-  // while (looping) {
-  //   const userPrompt = await askForPrompt();
-  //   Loading.start('Proccessing data in Mistral ai');
-  //   try {
-  //     const prompt = `${userPrompt} ${descriptions.join('\n')}`;
-  //     Loading.success(await mistral(prompt));
-  //   } catch (error) {
-  //     Loading.error('ERROR: Prosessing data in Mistral ai');
-  //     console.log(error);
-  //     process.exit(1);
-  //   }
-  // }
 }
 
 app(); // 🚀 Start the app.
+ 
