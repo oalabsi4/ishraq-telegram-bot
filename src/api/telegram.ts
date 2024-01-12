@@ -7,13 +7,14 @@ import { message } from 'telegraf/filters';
 
 export function telegram() {
   const bot = new Telegraf(process.env.telegramBotToken);
-  const test = () => console.log('middleware');
 
   bot.start(async ctx => {
     await ctx.reply('Welcome!');
   });
 
   bot.command('commands', async ctx => {
+    const isAuthCheck = await authCheck(ctx);
+    if (!isAuthCheck) return;
     await ctx.reply('choose a command', {
       reply_markup: {
         inline_keyboard: [
@@ -52,8 +53,8 @@ export function telegram() {
     });
     await NotionExportLogic(bot);
   });
-
-  bot.on(message('text'), async ctx => {
+  bot.use(authCheck);
+  bot.on(message('text'), ctx => {
     checkForRequests(ctx.message);
   });
   bot.launch();
