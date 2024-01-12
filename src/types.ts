@@ -6,11 +6,14 @@ declare global {
       dataBaseId: string;
       mistralToken: string;
       telegramBotToken: string;
+      kmkPricesId: string;
+      qyamPricesId: string;
+      unknowPrisesId: string;
     }
   }
 }
 
-export type NotionRes = {
+export type NotionRes <T extends NotionProps | NotionPriceListProps = NotionProps>  = {
   object: string;
   id: string;
   created_time: string;
@@ -30,10 +33,11 @@ export type NotionRes = {
     database_id: string;
   };
   archived: boolean;
-  properties: NotionProps;
+  properties: T;
   url: string;
   public_url: null | string;
 };
+export type NotionPriceListRes = NotionRes<NotionPriceListProps>;
 export type NotionProps = Record<'رمز المنتج', NotionSelect> &
   Record<'minutes', NotionFormula<FormuaTypeNumber>> &
   Record<'الصفحات', NotionNumber> &
@@ -77,44 +81,25 @@ export type RestructuredData = {
   productURL: string;
 };
 
-// type NotionProps = Record<
-//   NotionPropKeys,
-//   | NotionSelect
-//   | NotionFormula
-//   | NotionRelation
-//   | NotionDate
-//   | NotionCreateTime
-//   | NotionCreatedBy
-//   | NotionTitle
-//   | NotionText
-//   | NotionUrl
-//   | NotionNumber
-// >;
+export type PriceListRestructuredData = {
+  code: string;
+  description:string
+  type:string
+  price:number
+  metric:string
+  notes:string
+  pageID:string
+}
+export type NotionPriceListProps = Record<'الرمز', NotionText>&
+Record<'الشرح', NotionTitle>&
+Record<'النوع',NotionSelect>&
+Record<'السعر',NotionNumber>&
+Record<'وحدة القياس', NotionSelect>&
+Record<'ملاحظة', NotionText>&
+Record<'KMK-PRICING',NotionRelation>
 
-// type NotionPropKeys =
-//   | 'رمز المنتج'
-//   | 'minutes'
-//   | 'الصفحات'
-//   | 'NO-PARTNER'
-//   | 'الشريك'
-//   | 'سعر يدوي'
-//   | 'metric'
-//   | 'تاريخ الاستلام'
-//   | 'دليل استعمال الجدول'
-//   | 'المجموع'
-//   | 'KMK-PRICING'
-//   | 'العميل'
-//   | 'المدة'
-//   | 'seconds'
-//   | 'QYAM-PRICING'
-//   | 'Created time'
-//   | 'Created by'
-//   | 'الموظف المنتج'
-//   | 'السعر'
-//   | 'العدد'
-//   | 'النوع'
-//   | 'رابط المنتج'
-//   | 'الوصف';
+
+
 
 type NotionSelect = {
   id: string;

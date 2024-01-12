@@ -32,9 +32,8 @@ console.log(
 // .strict();
 
 async function app() {
-   await telegram()
-
+  await telegram();
+  // await writePagetoBillDB(process.env.dataBaseId);
 }
 
 app(); // 🚀 Start the app.
- 

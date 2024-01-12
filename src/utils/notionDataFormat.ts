@@ -9,7 +9,7 @@ import Log from "./logger.js";
  * @param  data - The Notion data to be mapped.
  * @return  The mapped data in exportable format.
  */
-export async function mappingNotionData(data: NotionRes[]) {
+export function mappingNotionData(data: NotionRes[]) {
     let dataForExport;
     try {
       dataForExport = data.map(e => ({

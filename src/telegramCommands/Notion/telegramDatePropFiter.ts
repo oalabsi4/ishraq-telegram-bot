@@ -1,15 +1,14 @@
 import type { Telegraf } from 'node_modules/telegraf/typings/telegraf.js';
 import { Context } from 'telegraf';
 import { Update } from 'telegraf/types';
-import path from 'path';
 import Log from '@utils/logger.js';
 import chalk from 'chalk';
 import { notionDatePropFilterStatement, notionDatePropFilterString } from '../../api/notion/notionDateFilter.js';
 import { awaitReply } from '../../api/telegramWaitForResponse.js';
 import { dateSelectionKeyboard } from './dateSelectionKeyboard.js';
+import { sendTelegramFile } from 'src/api/telegramSendFile.js';
 
 const dateRegex = /(20[0-9]{2})\s*-\s*(10|11|12|0[1-9])\s*-\s*(3[0-1]|2[0-9]|1[0-9]|0[1-9])\s*$/; //ex: 2022-01-01 (with zeros)
-
 
 /**
 + * Handles generation of the date filter file.
@@ -19,7 +18,7 @@ const dateRegex = /(20[0-9]{2})\s*-\s*(10|11|12|0[1-9])\s*-\s*(3[0-1]|2[0-9]|1[0
 + * @param propertyName - The name of the property to filter.
 + * @return A promise that resolves when the filter is applied.
 + */
-export async function TelegramDatePropertyFilter(bot: Telegraf<Context<Update>>,ctx: Context<Update> ,propertyName: string) {
+export async function TelegramDatePropertyFilter(bot: Telegraf<Context<Update>>, ctx: Context<Update>, propertyName: string) {
   const statementsNoString = ['past_month', 'past_year', 'this_week', 'past_week'];
   const statementsString = ['on_or_after', 'on_or_before', 'after', 'before'];
   const dateFilterTypes = ['past_month', 'past_year', 'this_week', 'past_week', 'on_or_after', 'on_or_before', 'after', 'before'];
@@ -56,14 +55,8 @@ async function handleDateFilterNoInput(
     // generate the xlsx File
     await notionDatePropFilterStatement(propertyName, dateStatement);
     // send the data
-    const filePath = path.join('exported_data', `${propertyName}-${dateStatement}.xlsx`);
-    await ctx.sendDocument(
-      {
-        source: filePath,
-        filename: `${propertyName}-${dateStatement}.xlsx`,
-      },
-      { caption: `Here you go 😃 \nfiltered data ${dateStatement}` }
-    );
+    await sendTelegramFile(ctx, propertyName, `Data for ${propertyName} - ${dateStatement} 😃`);
+
     Log.success('Data sent successfully', 'TelegramDatePropertyFilter => statementsNoString');
     return;
   } catch (error) {
@@ -106,14 +99,7 @@ async function handleDateFilterInput(
 
         try {
           await notionDatePropFilterString(propertyName, date, dateStatement);
-          const filePath = path.join('exported_data', `${propertyName}-${date}.xlsx`);
-          await ctx.sendDocument(
-            {
-              source: filePath,
-              filename: `${propertyName}-${date}.xlsx`,
-            },
-            { caption: `Here you go 😃 \nfiltered data ${dateStatement}:${date}` }
-          );
+          await sendTelegramFile(ctx, propertyName, `Data for ${propertyName} - ${dateStatement} 😃`);
           Log.success('Data sent successfully', 'TelegramDatePropertyFilter => statementsString');
           return;
         } catch (error) {

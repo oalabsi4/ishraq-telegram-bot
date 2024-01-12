@@ -5,6 +5,7 @@ import Log from '@utils/logger.js';
 import { mappingNotionData } from '@utils/notionDataFormat.js';
 import path from 'path';
 import type { NotionRes } from '../../types.js';
+import { fileName } from '@utils/fileName.js';
 
 
 
@@ -37,7 +38,7 @@ export async function notionDatePropFilterString(
   });
   const results = await mappingNotionData(data.results as NotionRes[]);
   Log.success('Data fetched successfully', 'NotionSelectPropNoDate');
-  const filePath = path.join('exported_data', `${propertyName}-${propertyValue}.xlsx`);
+  const filePath = path.join('exported_data', `${fileName(propertyName)}.xlsx`);
   createExcel(filePath, results);
 }
 
@@ -69,6 +70,6 @@ export async function notionDatePropFilterStatement(
   });
   const results = await mappingNotionData(data.results as NotionRes[]);
   Log.success('Data fetched successfully', 'NotionSelectPropNoDate');
-  const filePath = path.join('exported_data', `${propertyName}-${dateStatement}.xlsx`);
+  const filePath = path.join('exported_data', `${fileName(propertyName)}.xlsx`);
   createExcel(filePath, results);
 }

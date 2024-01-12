@@ -3,6 +3,7 @@ import { Update } from 'telegraf/types';
 import { exportNotionSelectPropertyValues } from '../../api/notion/notionSelectFilter.js';
 import { TelegramSelectPropertyFilter, handleSelectPropNoDate } from './telegramSelectPropFillter.js';
 import { TelegramDatePropertyFilter } from './telegramDatePropFiter.js';
+import { TelegramNotionPropertyFilter } from '../telegramFormulaStringExport.js';
 
 export async function NotionExportLogic(bot: Telegraf<Context<Update>>) {
   const notionClients = await exportNotionSelectPropertyValues('clients');
@@ -15,8 +16,6 @@ export async function NotionExportLogic(bot: Telegraf<Context<Update>>) {
   const notionPartnersArray = notionPartners.flatMap(e =>
     e.map(v => (v.text !== 'back' && v.text !== 'No_data' ? v.text : 'qwe'))
   );
-
-
 
   //* Handle date filter
   bot.action('dateFilter', async ctx => {
@@ -101,7 +100,7 @@ export async function NotionExportLogic(bot: Telegraf<Context<Update>>) {
     });
   });
 
-  // todo fix file names
+  // todo fix file names //I think it's fixed ?
   //* checking if a filter option is selected with or without date
   const ArgumentRegex = /^(.*?)-(.*)$/; //example: ClientWithDate-employee
   bot.action(ArgumentRegex, async ctx => {
@@ -116,8 +115,12 @@ export async function NotionExportLogic(bot: Telegraf<Context<Update>>) {
     if (['ClientWithoutDate', 'EmployeeWithoutDate'].includes(filterType)) {
       await handleSelectPropNoDate(ctx, filterType, propValue);
     }
-    if (['PartnerWithoutDate'].includes(filterType)) {
-      // todo make a function for this shit and export it
+    if (['PartnerWithoutDate', 'PartnerWithDate'].includes(filterType)) {
+      if (filterType === 'PartnerWithDate') {
+        await TelegramNotionPropertyFilter(bot, ctx, 'الشريك', propValue, true);
+      } else {
+        await TelegramNotionPropertyFilter(bot, ctx, 'الشريك', propValue, false);
+      }
     }
   });
 

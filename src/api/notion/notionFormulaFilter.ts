@@ -2,10 +2,11 @@ import { Client } from '@notionhq/client';
 import { QueryDatabaseResponse } from '@notionhq/client/build/src/api-endpoints.js';
 import Log from '@utils/logger.js';
 import { NotionRes } from '../../types.js';
-import { stringFormulasKeys } from './notionFormulatFetch.js';
+import { stringFormulasKeys } from './notionFormulaFetch.js';
 import { mappingNotionData } from '@utils/notionDataFormat.js';
 import { createExcel } from '@utils/Json2cvs.js';
 import path from 'path';
+import { fileName } from '@utils/fileName.js';
 
 /**
  * Filters a string Formula property based on various conditions.
@@ -92,7 +93,7 @@ export async function notionFormulaNoDateFilter(
     Log.success('Data fetched successfully', 'notionFormulaNoDateFilter');
     
     // Create an Excel file with the mapped data
-    const filePath = path.join('exported_data', `${propName}-${propValue}.xlsx`);
+    const filePath = path.join('exported_data', `${fileName(propName)}.xlsx`);
     createExcel(filePath, results);
   } catch (error) {
     // Log error message and exit the process
@@ -151,7 +152,7 @@ export async function notionFormulaFilterWithDateString(
       Log.success('Data fetched successfully', 'notionFormulaFilterWithDateString');
   
       // Create the file path for the exported Excel file
-      const filePath = path.join('exported_data', `${propName}-${propValue}.xlsx`);
+      const filePath = path.join('exported_data', `${fileName(propName)}.xlsx`);
   
       // Create the Excel file with the filtered data
       createExcel(filePath, results);
@@ -215,7 +216,7 @@ export async function notionFormulaFilterWithDate(
       // Log success message
       Log.success('Data fetched successfully', 'notionFormulaFilterWithDate');
       // Generate Excel file with the filtered data
-      const filePath = path.join('exported_data', `${propName}-${propValue}.xlsx`);
+      const filePath = path.join('exported_data', `${fileName(propName)}.xlsx`);
       createExcel(filePath, results);
     } catch (error) {
       // Log error message and exit with code 1

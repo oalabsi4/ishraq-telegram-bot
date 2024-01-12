@@ -1,12 +1,16 @@
 import Log from '@utils/logger.js';
 import chalk from 'chalk';
 import type { Telegraf } from 'node_modules/telegraf/typings/telegraf.js';
-import path from 'path';
 import { awaitReply } from 'src/api/telegramWaitForResponse.js';
 import { Context } from 'telegraf';
 import { Update } from 'telegraf/types';
-import { notionSelectPropDateStatement, notionSelectPropDateString, notionSelectPropNoDate } from '../../api/notion/notionSelectFilter.js';
+import {
+  notionSelectPropDateStatement,
+  notionSelectPropDateString,
+  notionSelectPropNoDate,
+} from '../../api/notion/notionSelectFilter.js';
 import { dateSelectionKeyboard } from './dateSelectionKeyboard.js';
+import { sendTelegramFile } from 'src/api/telegramSendFile.js';
 
 /**
  * Handles Telegram property filtering based on the provided date.
@@ -75,14 +79,10 @@ export async function TelegramSelectPropertyFilter(
               dateFilterType as 'on_or_after' | 'on_or_before' | 'after' | 'before'
             );
             // Send the data
-            const filePath = path.join('exported_data', `${propValue}-${filterType === 'ClientWithDate' ? 'العميل' : filterType === 'EmployeeWithDate' ? 'الموظف المنتج' : 'error'}.xlsx`);
-            await ctx.sendDocument(
-              {
-                source: filePath,
-                filename: `${propValue}-${filterType === 'ClientWithDate' ? 'العميل' : filterType === 'EmployeeWithDate' ? 'الموظف المنتج' : 'error'}.xlsx`,
-              },
-              { caption: `Data for ${filterType} ${propValue} and ${dateFilterType}: ${date} 😃` }
-            );
+            const propName =
+              filterType === 'ClientWithDate' ? 'العميل' : filterType === 'EmployeeWithDate' ? 'الموظف المنتج' : 'error';
+            await sendTelegramFile(ctx, propName, `Data for ${filterType} ${propValue} and ${dateFilterType} 😃`);
+            
           } else {
             await ctx.reply(`Wrong date format: ${chalk.magenta(date)}\n😈 START OVER`);
             Log.warn(`The user entered a wrong date format: ${chalk.magenta(date)}\n😈 START OVER`, 'TelegramPropertyFilter');
@@ -105,37 +105,32 @@ export async function TelegramSelectPropertyFilter(
    */
   async function handleDateWithoutInput(ctx: Context<Update>, filterType: string, propValue: string, dateFilterType: string) {
     ctx.deleteMessage(); // Remove the previous keyboard
-    const promise = await ctx.reply(`Fetching data for : ${propValue} and date: ${dateFilterType}`);
     // Generating the xlsx file
     await notionSelectPropDateStatement(
-      filterType === 'ClientWithDate' ? 'العميل' : filterType === 'ClientWithDate' ? 'الموظف المنتج' : 'error',
+      filterType === 'ClientWithDate' ? 'العميل' : filterType === 'EmployeeWithDate' ? 'الموظف المنتج' : 'error',
       propValue,
       dateFilterType as 'past_month' | 'past_year' | 'this_week' | 'past_week'
     );
 
     // Send the data
-    const filePath = path.join('exported_data', `${propValue}-${filterType === 'ClientWithDate' ? 'العميل' : filterType === 'EmployeeWithDate' ? 'الموظف المنتج' : 'error'}.xlsx`);
-    await ctx.sendDocument(
-      {
-        source: filePath,
-        filename: `${propValue}-${filterType === 'ClientWithDate' ? 'العميل' : filterType === 'EmployeeWithDate' ? 'الموظف المنتج' : 'error'}.xlsx`,
-      },
-      { caption: `Data for ${filterType} ${propValue} and ${dateFilterType} 😃` }
-    );
-}
+    const propName = filterType === 'ClientWithDate' ? 'العميل' : filterType === 'EmployeeWithDate' ? 'الموظف المنتج' : 'error';
+    await sendTelegramFile(ctx, propName, `Data for ${filterType} ${propValue} and ${dateFilterType} 😃`);
+  }
 }
 
+/**
+ * Generates an xlsx file based on the filter type and property value if no date is required.
+ *
+ * @param ctx - The context object containing information about the update.
+ * @param filterType - The type of filter to apply.
+ * @param propValue - The property value to use for filtering.
+ */
 export async function handleSelectPropNoDate(ctx: Context<Update>, filterType: string, propValue: string) {
-  await ctx.deleteMessage(); //remove the previous keyboard
+  await ctx.deleteMessage(); // remove the previous keyboard
+
   // generating xlsx file
   await notionSelectPropNoDate(filterType === 'ClientWithoutDate' ? 'العميل' : 'الموظف المنتج', propValue);
-  const filePath = path.join('exported_data', `${filterType}-${propValue}.xlsx`);
+  const propName = filterType === 'ClientWithoutDate' ? 'العميل' : 'الموظف المنتج';
 
-  await ctx.sendDocument(
-    {
-      source: filePath,
-      filename: `${filterType}-${propValue}.xlsx`,
-    },
-    { caption: `Data for ${filterType} ${propValue} 😃` }
-  );
+  await sendTelegramFile(ctx, propName, `Data for ${propName} - ${propValue} 😃`);
 }

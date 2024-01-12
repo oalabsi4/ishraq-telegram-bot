@@ -6,7 +6,7 @@ type RequestsArray = {
   id: number;
 };
 const Requests: RequestsArray[] = [];
-export function awaitReply(id: number) {
+export function awaitReply(id: number,timeOut= 10000) {
   const promise = new Promise((resolve, reject) => {
     Requests.push({
       resolve,
@@ -14,7 +14,6 @@ export function awaitReply(id: number) {
       id,
     });
   });
-  console.log(Requests);
   setTimeout(() => {
     for (let i = 0; i < Requests.length; i++) {
       const request = Requests[i];
@@ -22,18 +21,17 @@ export function awaitReply(id: number) {
       request.reject('timeout');
       Requests.splice(i, 1);
     }
-  }, 10000);
+  }, timeOut);
 
   return promise as Promise<Message.TextMessage>;
 }
 
-export async function checkForRequests(message: Message.TextMessage) {
+export function checkForRequests(message: Message.TextMessage) {
   const messageId = message.reply_to_message?.message_id;
 
   for (let i = 0; i < Requests.length; i++) {
     const request = Requests[i];
     if (request.id !== messageId) continue;
-    console.log(request);
     request.resolve(message);
     Requests.splice(i, 1);
   }

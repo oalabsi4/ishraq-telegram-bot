@@ -1,13 +1,41 @@
 import { Telegraf } from 'telegraf';
 import { checkForRequests } from './telegramWaitForResponse.js';
 import { NotionExportLogic } from 'src/telegramCommands/Notion/notionExportLogic.js';
+import { writeNotionBill } from '@/telegramCommands/Notion/NotionWriteBill.js';
+import { authCheck } from '@utils/auth.js';
+import { message } from 'telegraf/filters';
 
-export async function telegram() {
+export function telegram() {
   const bot = new Telegraf(process.env.telegramBotToken);
+  const test = () => console.log('middleware');
 
-  bot.start(async ctx => await ctx.reply('👋'));
+  bot.start(async ctx => {
+    await ctx.reply('Welcome!');
+  });
 
-  bot.command('export', async ctx => {
+  bot.command('commands', async ctx => {
+    await ctx.reply('choose a command', {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: 'Export data from Notion', callback_data: 'export' }],
+          [{ text: 'Write to Notion', callback_data: 'NotionBillReg' }],
+        ],
+      },
+    });
+  });
+
+  bot.action('NotionBillReg', async ctx => {
+    await writeNotionBill(ctx, bot);
+  });
+
+  bot.command('test', ctx => {
+    ctx.reply('\\ # shit normal', {
+      parse_mode: 'Markdown',
+    });
+  });
+
+  bot.action('export', async ctx => {
+    await ctx.deleteMessage();
     await ctx.reply('Choose the filter type you want to export.', {
       reply_markup: {
         inline_keyboard: [
@@ -22,15 +50,12 @@ export async function telegram() {
         ],
       },
     });
+    await NotionExportLogic(bot);
   });
 
-  bot.on('message', async ctx => {
-    if ('text' in ctx.message) {
-      checkForRequests(ctx.message);
-      console.log('first');
-    }
+  bot.on(message('text'), async ctx => {
+    checkForRequests(ctx.message);
   });
-  await NotionExportLogic(bot);
   bot.launch();
 
   // Enable graceful stop

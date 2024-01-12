@@ -5,24 +5,24 @@ import path from 'path';
 import type { NotionRes } from '../../types.js';
 import Log from '@utils/logger.js';
 import { mappingNotionData } from '@utils/notionDataFormat.js';
+import { fileName } from '@utils/fileName.js';
 
 /**
  * Retrieves data from the Notion database.
  *
  * @return  An array of NotionRes objects representing the data retrieved from the Notion database.
  */
-export async function fetchNotionData() {
+export async function fetchNotionData<T = NotionRes>(dataBaseId: string) {
   // const answers = await askForNotionToken();
   const notion = new Client({
     auth: process.env.notionToken, // ?? answers.NotionToken,
   });
 
   const notionDB = await notion.databases.query({
-    database_id: process.env.dataBaseId, // ?? answers.askForDatabaseId,
+    database_id: dataBaseId, // ?? answers.askForDatabaseId,
   });
-  return notionDB.results as NotionRes[];
+  return notionDB.results as T[];
 }
-
 
 /**
  * Generates a Notion property array based on the specified type.
@@ -35,7 +35,7 @@ export async function exportNotionSelectPropertyValues(type: 'clients' | 'partne
     text: string;
     callback_data: string;
   }[][];
-  const rows = await fetchNotionData();
+  const rows = await fetchNotionData(process.env.dataBaseId);
 
   try {
     const notionPropertyArray = rows.map(e => {
@@ -68,7 +68,6 @@ export async function exportNotionSelectPropertyValues(type: 'clients' | 'partne
   }
 }
 
-
 /**
  * Retrieves data from Notion database based on the provided property name and value for a Select property without date.
  *
@@ -93,7 +92,7 @@ export async function notionSelectPropNoDate(propertyName: string, propertyValue
   });
   const results = await mappingNotionData(data.results as NotionRes[]);
   Log.success('Data fetched successfully', 'NotionSelectPropNoDate');
-  const filePath = path.join('exported_data', `${propertyName}-${propertyValue}.xlsx`);
+  const filePath = path.join('exported_data', `${fileName(propertyName)}.xlsx`);
   createExcel(filePath, results);
 }
 
@@ -136,7 +135,7 @@ export async function notionSelectPropDateStatement(
   });
   const results = await mappingNotionData(data.results as NotionRes[]);
   Log.success('Data fetched successfully', 'notionSelectPropDateStatement');
-  const filePath = path.join('exported_data', `${propertyName}-${propertyValue}.xlsx`);
+  const filePath = path.join('exported_data', `${fileName(propertyName)}.xlsx`);
   createExcel(filePath, results);
 }
 
@@ -180,6 +179,6 @@ export async function notionSelectPropDateString(
   });
   const results = await mappingNotionData(data.results as NotionRes[]);
   Log.success('Data fetched successfully', 'notionSelectPropDateString');
-  const filePath = path.join('exported_data', `${propertyname}-${propertyValue}.xlsx`);
+  const filePath = path.join('exported_data', `${fileName(propertyname)}.xlsx`);
   createExcel(filePath, results);
 }
