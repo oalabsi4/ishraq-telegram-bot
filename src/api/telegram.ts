@@ -1,15 +1,14 @@
-import { Context, Scenes, session, Telegraf } from 'telegraf';
-import { checkForRequests } from './telegramWaitForResponse.js';
-import { NotionExportLogic } from 'src/telegramCommands/Notion/notionExportLogic.js';
-import { writeNotionBill } from '@/telegramCommands/Notion/NotionWriteBill.js';
-import { authCheck } from '@utils/auth.js';
+import { dataToWrite, dateRegex, PriceListDataCache } from '@/telegramCommands/notionScenes/collectedDataFromUser.js';
+import { displayCodeSelectionList, handleCodeSelection } from '@/telegramCommands/notionScenes/getCode.js';
+import { handlePartnerSelection, partnerChoiceKeyboard } from '@/telegramCommands/notionScenes/getPartner.js';
+import { handleProductTypeSelection, productCodeSelectionKeyboard } from '@/telegramCommands/notionScenes/getType.js';
+import { Scenes, session, Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
+import {
+  isValidNumber
+} from './notion/fetchSelectPropValues.js';
+import { writePageToBillDB } from './notion/writePagetoBillDB.js';
 import { testScene } from './testingScenes.js';
-import { fetchPricesData, filterPricesFormat, formatSelectionDataForTelegram, isValidNumber, NotionProductSelection, selectPropValues } from './notion/fetchSelectPropValues.js';
-import { formatTelegramKeyboard } from '@utils/telegramkeyboardFormater.js';
-import { PriceListRestructuredData } from '@/types.js';
-import { date } from 'zod';
-import { exportNotionSelectPropertyValues } from './notion/notionSelectFilter.js';
 
 export function telegram() {
   // test scenes
@@ -33,7 +32,8 @@ export function telegram() {
     getPagesScene,
     getEmplyeeScene,
     getManualPriceScene,
-    getLinkScene
+    getLinkScene,
+    runNotionWriteFunctionScene,
   } = {
     getCodeScene: new Scenes.BaseScene<Scenes.SceneContext>('getCode'),
     getPartnerScene: new Scenes.BaseScene<Scenes.SceneContext>('getPartner'),
@@ -47,7 +47,9 @@ export function telegram() {
     getManualPriceScene: new Scenes.BaseScene<Scenes.SceneContext>('getManualPrice'),
     getTypeScene: new Scenes.BaseScene<Scenes.SceneContext>('getType'),
     getLinkScene: new Scenes.BaseScene<Scenes.SceneContext>('getLink'),
+    runNotionWriteFunctionScene: new Scenes.BaseScene<Scenes.SceneContext>('runNotionWriteFunctionScene'),
   };
+
   type Scenetype = Scenes.BaseScene<Scenes.SceneContext>;
 
   async function writeToNotionScenes(
@@ -62,187 +64,227 @@ export function telegram() {
     getPagesScene: Scenetype,
     getEmplyeeScene: Scenetype,
     getManualPriceScene: Scenetype,
-    getLinkScene: Scenetype
+    getLinkScene: Scenetype,
+    runNotionWriteFunctionScene: Scenetype
   ) {
-    const dateRegex = /(20[0-9]{2})\s*-\s*(10|11|12|0[1-9])\s*-\s*(3[0-1]|2[0-9]|1[0-9]|0[1-9])\s*$/; //ex: 2022-01-01 (with zeros)
-
-    let partnerSelection: 'KMK' | 'QYAM' | 'UNKNOWN'= 'KMK';
-    let selectedType: string;
-    const priceList = await fetchPricesData(partnerSelection);
-    const uniqueProductCodes = selectPropValues(priceList);
-    const chooseTypeKeyboard = formatTelegramKeyboard(uniqueProductCodes);
-    let priceStructuredData :PriceListRestructuredData[]
-    let filteredResults :PriceListRestructuredData | null
-    const clientsToSelectFrom =await  exportNotionSelectPropertyValues('clients',true);
-    const clientsKeyboard = formatTelegramKeyboard(clientsToSelectFrom as string[]);
-    //! to use in writing
-    let priceListName: 'KMK-PRICING' | 'QYAM-PRICING' | 'NO-PARTNER';
-    let productCode:string
-    let productDate :string
-    let productDescription : string
-    let selectedClient:string
-    let productCount : number
-    let productLink : string
     //? get the partner name from the user
-    getPartnerScene.enter(async ctx => {
-      await ctx.reply('please enter the partner name:', {
+    getPartnerScene.enter(partnerChoiceKeyboard());
+    getPartnerScene.action(['KMK', 'QYAM', 'UNKNOWN', 'Cancel'], handlePartnerSelection);
+
+    //? get the code from the user
+    const ChooseTypeKeyboard = await PriceListDataCache.getChooseTypeKeyboard()
+    getTypeScene.enter(ctx => productCodeSelectionKeyboard(ctx, ChooseTypeKeyboard));
+    getTypeScene.action([...(await PriceListDataCache.getUniqueProductCodes()), 'Cancel'], handleProductTypeSelection);
+
+    //? get the product code from the user
+    getCodeScene.enter(displayCodeSelectionList);
+
+    getCodeScene.on(message('text'), handleCodeSelection);
+
+    //? get the date from user
+    getDateSene.enter(async ctx => {
+      await ctx.reply('type the date in the format: YYYY-MM-DD');
+    });
+    getDateSene.on(message('text'), async ctx => {
+      const userinput = ctx.message.text;
+      if (!userinput || !dateRegex.test(userinput)) {
+        await ctx.reply('something went wrong');
+        await ctx.scene.reenter();
+        return;
+      }
+      dataToWrite.productDate = userinput;
+      await ctx.scene.enter('getDescription');
+    });
+
+    //? get the description from user
+    getDescriptionScene.enter(async ctx => {
+      await ctx.reply('type the description of the product');
+    });
+    getDescriptionScene.on(message('text'), async ctx => {
+      const userinput = ctx.message.text;
+      if (!userinput || userinput.length < 3) {
+        await ctx.reply('something went wrong');
+        await ctx.scene.reenter();
+        return;
+      }
+      dataToWrite.productDescription = userinput;
+      await ctx.scene.enter('getClient');
+    });
+    //? get the client from user
+    getClientScene.enter(async ctx => {
+      await ctx.reply('choose a client please:', {
         reply_markup: {
-          inline_keyboard: [
-            [{ text: 'KMK', callback_data: 'KMK' }],
-            [{ text: 'QYAM', callback_data: 'QYAM' }],
-            [{ text: 'UNKOWN', callback_data: 'UNKNOWN' }],
-            [{ text: 'Cancel', callback_data: 'Cancel' }],
-          ],
+          inline_keyboard: [...(await PriceListDataCache.getClientsKeyboard()), [{ text: 'Cancel', callback_data: 'Cancel' }]],
         },
       });
     });
-    getPartnerScene.action(['KMK', 'QYAM', 'UNKNOWN', 'Cancel'], async ctx => {
-      const choice = ctx.match?.[0] as 'KMK' | 'QYAM' | 'UNKNOWN' | 'Cancel';
-      if (choice === 'Cancel') {
-        await ctx.reply('canceled');
-        return await ctx.scene.leave();
+    getClientScene.action([...((await PriceListDataCache.getClientsToSelectFrom()) as string[]), 'Cancel'], async ctx => {
+      const userChoice = ctx.match?.[0];
+      if (!userChoice) {
+        await ctx.reply('something went wrong');
+        await ctx.scene.reenter();
+        return;
       }
-      if (['KMK', 'QYAM', 'UNKNOWN'].includes(choice)) {
-        priceListName = choice === 'KMK' ? 'KMK-PRICING' : choice === 'QYAM' ? 'QYAM-PRICING' : 'NO-PARTNER';
-        partnerSelection = choice;
-        await ctx.scene.enter('getType');
+      if (userChoice === 'Cancel') {
+        await ctx.reply('Operation canceled');
+        await ctx.scene.leave();
+        return;
+      }
+      if (((await PriceListDataCache.getClientsToSelectFrom()) as string[]).includes(userChoice)) {
+        dataToWrite.selectedClient = userChoice;
+        await ctx.scene.enter('getCount');
       } else {
         await ctx.reply('something went wrong');
         await ctx.scene.reenter();
       }
     });
 
-    //? get the code from the user
-    getTypeScene.enter(async ctx => {
-      await ctx.reply('choose a type please:', {
-        reply_markup: {
-          inline_keyboard: [...chooseTypeKeyboard, [{ text: 'Cancel', callback_data: 'Cancel' }]],
-        },
-      });
-    });
-    getTypeScene.action([...uniqueProductCodes, 'Cancel'], async ctx => {
-      const userChoice = ctx.match?.[0];
-      if (!userChoice) {
-        await ctx.reply('something went wrong');
-        await ctx.scene.reenter();
-      }
-      if (userChoice === 'Cancel') {
-        await ctx.reply('canceled');
-        return await ctx.scene.leave();
-      }
-      if (uniqueProductCodes.includes(userChoice)) {
-        selectedType = userChoice;
-        const choosenRow = filterPricesFormat(selectedType, priceList);
-        priceStructuredData = choosenRow;
-        await ctx.scene.enter('getCode');
-      }else{
-        await ctx.reply('something went wrong');
-        await ctx.scene.reenter();
-      }
-    });
-
-    getCodeScene.enter(async ctx => {
-      const codeCHoiceList = formatSelectionDataForTelegram(priceStructuredData);
-      await ctx.reply(`type the number of the code you want:\n${codeCHoiceList}`)
-    })
-    getCodeScene.on(message('text'), async ctx => {
-      if(!ctx.message.text){
-        await ctx.reply('something went wrong');
-        await ctx.scene.reenter();
-      }
-      const selectedRow = NotionProductSelection(priceStructuredData, ctx.message.text);
-      filteredResults = selectedRow
-      productCode = selectedRow?.code ?? ''
-
-      await ctx.scene.enter('getDate');
-
-    })
-    getDateSene.enter(async ctx => {
-      await ctx.reply('type the date in the format: YYYY-MM-DD');
-
-    })
-    getDateSene.on(message('text'),async ctx =>{
-      const userinput = ctx.message.text
-      if(!userinput || !dateRegex.test(userinput)){
-        await ctx.reply('something went wrong');
-        await ctx.scene.reenter();
-      }
-      productDate = userinput
-      await ctx.scene.enter('getDescription');
-
-    })
-    getDescriptionScene.enter(async ctx => {
-
-      await ctx.reply('type the description of the product');
-    })
-    getDescriptionScene.on(message('text'),async ctx=>{
-      const userinput = ctx.message.text
-      if(!userinput || userinput.length < 3){
-        await ctx.reply('something went wrong');
-        await ctx.scene.reenter();
-      }
-      productDescription = userinput
-      await ctx.scene.enter('getClient');
-    })
-    getClientScene.enter(async ctx => {
-      await ctx.reply('choose a client please:', {
-        reply_markup:{
-          inline_keyboard: [...clientsKeyboard, [{ text: 'Cancel', callback_data: 'Cancel' }]],
-        }
-      })
-    })
-    getClientScene.action([...clientsToSelectFrom as string[], 'Cancel'], async ctx => {
-      const userChoice = ctx.match?.[0];
-      if(!userChoice){
-        await ctx.reply('something went wrong');
-        await ctx.scene.reenter();
-      }
-      if(userChoice === 'Cancel'){
-        await ctx.reply('Operation canceled')
-        await ctx.scene.leave()
-      }
-      if( (clientsToSelectFrom as string[]).includes(userChoice)){
-        selectedClient = userChoice
-        await ctx.scene.enter('getCount');
-      }else{
-        await ctx.reply('something went wrong');
-        await ctx.scene.reenter();
-      }
-    })
-
+    //? get the count from user
     getCountScene.enter(async ctx => {
-
       await ctx.reply('type the count of the product');
-    })
+    });
     getCountScene.on(message('text'), async ctx => {
-      const userInput = ctx.message.text
+      const userInput = ctx.message.text;
       if (!userInput || userInput.trim().length === 0 || !isValidNumber(+userInput) || +userInput <= 0) {
         await ctx.reply('Please enter a valid count');
         await ctx.scene.reenter();
+        return;
       }
-      productCount = +userInput
+      dataToWrite.productCount = +userInput;
       await ctx.scene.enter('getLink');
-    })
+    });
+    //? get the link from user
     getLinkScene.enter(async ctx => {
       await ctx.reply('type the link of the product');
-    })
+    });
     getLinkScene.on(message('text'), async ctx => {
-      const userInput = ctx.message.text
-      if(!userInput || userInput.trim().length === 0 ){
+      const userInput = ctx.message.text;
+      if (!userInput || userInput.trim().length === 0) {
         await ctx.reply('something went wrong');
         await ctx.scene.reenter();
+        return;
       }
-      productLink = userInput
-      if (filteredResults && ['بالصفحة'].includes(filteredResults.metric)) {
-          //todo request pages
+      dataToWrite.productLink = userInput;
+      if (dataToWrite.filteredResults && ['بالصفحة'].includes(dataToWrite.filteredResults.metric)) {
+        //todo request pages
+        await ctx.scene.enter('getPages');
+        return;
       }
-      if (filteredResults && ['نسبة مئوية', 'برمجة'].includes(filteredResults.metric)) {
-          //todo request manual price
+      if (dataToWrite.filteredResults && ['نسبة مئوية', 'برمجة'].includes(dataToWrite.filteredResults.metric)) {
+        //todo request manual price
+        await ctx.scene.enter('getManualPrice');
+        return;
       }
-      if (filteredResults && ['بالدقيقة', 'بالثانية'].includes(filteredResults.metric)) {
-          //todo request duration 
+      if (dataToWrite.filteredResults && ['بالدقيقة', 'بالثانية'].includes(dataToWrite.filteredResults.metric)) {
+        //todo request duration
+        await ctx.scene.enter('GetDuration');
+        return;
       }
-    })
+    });
+    //? get pages count from user
+    getPagesScene.enter(async ctx => {
+      await ctx.reply('type the number of pages');
+    });
+    getPagesScene.on(message('text'), async ctx => {
+      const userInput = ctx.message.text;
+      if (!userInput || userInput.trim().length === 0 || !isValidNumber(+userInput) || +userInput <= 0) {
+        await ctx.reply('Please enter a valid page count');
+        await ctx.scene.reenter();
+        return;
+      }
+      dataToWrite.productPages = +userInput;
+      await ctx.scene.enter('getEmplyee');
+    });
+
+    //? get manual price from user
+    getManualPriceScene.enter(async ctx => {
+      await ctx.reply('type the manual price');
+    });
+    getManualPriceScene.on(message('text'), async ctx => {
+      const userInput = ctx.message.text;
+      if (!userInput || userInput.trim().length === 0 || !isValidNumber(+userInput) || +userInput < 0) {
+        await ctx.reply('Please enter a valid manual price');
+        await ctx.scene.reenter();
+        return;
+      }
+      dataToWrite.productManualPrice = +userInput;
+      await ctx.scene.enter('getEmplyee');
+    });
+
+    //? get duration from user
+    GetDurationScene.enter(async ctx => {
+      await ctx.reply('type the duration of the product');
+    });
+    GetDurationScene.on(message('text'), async ctx => {
+      const duration = ctx.message.text;
+      const durationRegext = /(,?)(0?[1-9]|[1-9][0-9]):([0-6]0|0[0-9]|[1-9])(,?)/g;
+      if (!duration || duration.trim().length === 0 || !durationRegext.test(duration)) {
+        await ctx.reply('something went wrong');
+        await ctx.scene.reenter();
+        return;
+      }
+      dataToWrite.productDuration = duration;
+      await ctx.scene.enter('getEmplyee');
+    });
+
+    //? get the employee name
+    getEmplyeeScene.enter(async ctx => {
+      await ctx.reply('choose an employee from the list:', {
+        reply_markup: {
+          inline_keyboard: [
+            ...(await PriceListDataCache.getEmployeesKeyboard()),
+            [
+              {
+                text: 'cancel',
+                callback_data: 'cancel',
+              },
+            ],
+          ],
+        },
+      });
+    });
+    getEmplyeeScene.action([...((await PriceListDataCache.getEmployeeToSelectFrom()) as string[]), 'cancel'], async ctx => {
+      const userInput = ctx.match[0];
+      if (!userInput || userInput.trim().length === 0) {
+        await ctx.reply('something went wrong');
+        await ctx.scene.reenter();
+        return;
+      }
+      if (userInput === 'cancel') {
+        await ctx.scene.leave();
+        return;
+      }
+      dataToWrite.productEmployee = userInput;
+      await ctx.scene.enter('runNotionWriteFunctionScene');
+      return;
+    });
+    //? try run the function
+    runNotionWriteFunctionScene.enter(async ctx => {
+      await ctx.reply('processing...');
+      try {
+        await writePageToBillDB(
+          process.env.dataBaseId,
+          dataToWrite.filteredResults?.pageID ?? '',
+          dataToWrite.priceListName,
+          dataToWrite.productCode,
+          dataToWrite.productDate,
+          dataToWrite.productDescription,
+          dataToWrite.selectedClient,
+          dataToWrite.productCount,
+          dataToWrite.productEmployee,
+          dataToWrite.productLink,
+          dataToWrite.productManualPrice,
+          dataToWrite.productDuration,
+          dataToWrite.productPages
+        ); // Call the function you want to try running here
+        await ctx.reply('done');
+      } catch (error) {
+        console.error('Error while running the function:', error);
+        await ctx.reply('something went wrong');
+        await ctx.scene.leave();
+        return;
+      }
+    });
   }
   writeToNotionScenes(
     getPartnerScene,
@@ -256,23 +298,31 @@ export function telegram() {
     getPagesScene,
     getEmplyeeScene,
     getManualPriceScene,
-    getLinkScene
-  )
+    getLinkScene,
+    runNotionWriteFunctionScene
+  );
   testScene(getNameScene, getAgeScene, getGenderScene, displayInfoScene);
   const bot = new Telegraf<Scenes.SceneContext>(process.env.telegramBotToken);
-  const stage = new Scenes.Stage<Scenes.SceneContext>([getPartnerScene,
-    getTypeScene,
-    getCodeScene,
-    getDateSene,
-    getDescriptionScene,
-    getClientScene,
-    getCountScene,
-    GetDurationScene,
-    getPagesScene,
-    getEmplyeeScene,
-    getManualPriceScene,], {
-    ttl: 100,
-  });
+  const stage = new Scenes.Stage<Scenes.SceneContext>(
+    [
+      getPartnerScene,
+      getTypeScene,
+      getCodeScene,
+      getDateSene,
+      getDescriptionScene,
+      getClientScene,
+      getCountScene,
+      GetDurationScene,
+      getPagesScene,
+      getEmplyeeScene,
+      getManualPriceScene,
+      runNotionWriteFunctionScene,
+      getLinkScene,
+    ],
+    {
+      ttl: 100,
+    }
+  );
 
   // const bot = new Telegraf(process.env.telegramBotToken);
   bot.use(session());

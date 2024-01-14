@@ -37,6 +37,7 @@ const plugins = [
       bundle: true,
       define: { DEBUG: 'true' },
       plugins,
+      sourcemap: true,
     });
 
     // Enable watch mode
@@ -47,7 +48,7 @@ const plugins = [
 })();
 
 // to run bundled file.
-async function run() {
+ function run() {
   // 🔪 kill last spawned worker
   if (worker) {
     try {
@@ -62,10 +63,10 @@ async function run() {
 
   //🔥 start new worker
   console.log(chalk.yellow(`\n👀 Watching for changes in "./src/**/*" ...\n`));
-  worker = spawn('node', [outfile, ...process.argv.slice(2)], { stdio: 'inherit' });
+  worker = spawn('node', ['--enable-source-maps',outfile, ...process.argv.slice(2)], { stdio: 'inherit' });
 
   //👂 listen for worker exit signal.
-  worker.on('exit', async code => {
+  worker.on('exit',  code => {
     if (code !== 0) return;
     console.log(chalk.yellow(`\n\n🕐 Waiting for new changes ...`));
   });

@@ -2,7 +2,7 @@ import { Client } from '@notionhq/client';
 import { QueryDatabaseResponse } from '@notionhq/client/build/src/api-endpoints.js';
 import { createExcel } from '@utils/Json2cvs.js';
 import path from 'path';
-import type { NotionRes } from '../../types.js';
+import type { NotionRes, TeleggramInlineKeyboard } from '../../types.js';
 import Log from '@utils/logger.js';
 import { mappingNotionData } from '@utils/notionDataFormat.js';
 import { fileName } from '@utils/fileName.js';
@@ -24,6 +24,7 @@ export async function fetchNotionData<T = NotionRes>(dataBaseId: string) {
   return notionDB.results as T[];
 }
 
+
 /**
  * Generates a Notion property array based on the specified type.
  *
@@ -31,10 +32,6 @@ export async function fetchNotionData<T = NotionRes>(dataBaseId: string) {
  * @return  The generated Notion property array.
  */
 export async function exportNotionSelectPropertyValues(type: 'clients' | 'partners' | 'employees',array=false) {
-  type TeleggramInlineKeyboard = {
-    text: string;
-    callback_data: string;
-  }[][];
   const rows = await fetchNotionData(process.env.dataBaseId);
 
   try {

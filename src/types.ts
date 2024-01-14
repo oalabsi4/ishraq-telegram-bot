@@ -90,6 +90,52 @@ export type PriceListRestructuredData = {
   notes:string
   pageID:string
 }
+export type CacheType = {
+  priceList: {
+    data: NotionPriceListRes[] | null;
+    time: number;
+  };
+  uniqueProductCodes: {
+    data: string[] | null;
+    time: number;
+  };
+  chooseTypeKeyboard: {
+    data: | {
+      text: string;
+      callback_data: string;
+    }[][]
+    | null;
+    time: number;
+  };
+  clientsToSelectFrom: {
+    data: TeleggramInlineKeyboard | string[] | null;
+    time: number;
+  };
+  employeeToSelectFrom: {
+    data: TeleggramInlineKeyboard | string[] | null;
+    time: number;
+  };
+  clientsKeyboard: {
+    data: | {
+      text: string;
+      callback_data: string;
+    }[][]
+    | null;
+    time: number;
+  };
+  employeesKeyboard: {
+    data: | {
+      text: string;
+      callback_data: string;
+    }[][]
+    | null;
+    time: number;
+  };
+};
+export type TeleggramInlineKeyboard = {
+  text: string;
+  callback_data: string;
+}[][];
 export type NotionPriceListProps = Record<'الرمز', NotionText>&
 Record<'الشرح', NotionTitle>&
 Record<'النوع',NotionSelect>&
