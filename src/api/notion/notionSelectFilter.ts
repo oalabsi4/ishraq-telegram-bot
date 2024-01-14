@@ -30,7 +30,7 @@ export async function fetchNotionData<T = NotionRes>(dataBaseId: string) {
  * @param type - The type of Notion property array to generate. Valid values are: 'clients', 'partners', 'employees'.
  * @return  The generated Notion property array.
  */
-export async function exportNotionSelectPropertyValues(type: 'clients' | 'partners' | 'employees') {
+export async function exportNotionSelectPropertyValues(type: 'clients' | 'partners' | 'employees',array=false) {
   type TeleggramInlineKeyboard = {
     text: string;
     callback_data: string;
@@ -61,10 +61,11 @@ export async function exportNotionSelectPropertyValues(type: 'clients' | 'partne
       return [{ text: e, callback_data: e }];
     });
     notionProperty.push([{ text: 'back', callback_data: 'back_to_main_export' }]);
-    return notionProperty;
+    return array ? uniquePropertyArray : notionProperty;
   } catch (error) {
     console.log(error);
-    return [[{ text: 'No_data', callback_data: 'NO_DATA' }], [{ text: 'back', callback_data: 'back_to_main_export' }]];
+    if(!array)return [[{ text: 'No_data', callback_data: 'NO_DATA' }], [{ text: 'back', callback_data: 'back_to_main_export' }]];
+    else return [[{ text: 'back', callback_data: 'cancel' }]];
   }
 }
 
