@@ -1,3 +1,5 @@
+import { Scenes } from "telegraf";
+
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {
   namespace NodeJS {
@@ -12,6 +14,7 @@ declare global {
     }
   }
 }
+export type Scenetype = Scenes.BaseScene<Scenes.SceneContext>;
 
 export type NotionRes <T extends NotionProps | NotionPriceListProps = NotionProps>  = {
   object: string;
