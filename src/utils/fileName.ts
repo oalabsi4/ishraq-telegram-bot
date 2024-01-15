@@ -1,4 +1,3 @@
-
 export function fileName(name: string) {
   const date = {
     year: new Date().getFullYear(),
@@ -9,5 +8,3 @@ export function fileName(name: string) {
 
   return `${name}-${date.year}-${date.month}-${date.day}-${date.hour}`;
 }
-
-

@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import { NotionRes } from 'src/types.js';
+import type { NotionRes } from 'src/types.js';
 import Log from '@utils/logger.js';
 
 export const stringFormulasKeys: StringFormulasKeys = {
@@ -7,16 +7,15 @@ export const stringFormulasKeys: StringFormulasKeys = {
   partner: 'الشريك',
   metric: 'metric',
   codeDescription: 'شرح الرمز',
-  type : 'النوع'
+  type: 'النوع',
 };
 type StringFormulasKeys = {
   tableHelper: 'دليل استعمال الجدول';
   partner: 'الشريك';
   metric: 'metric';
   codeDescription: 'شرح الرمز';
-  type : 'النوع';
+  type: 'النوع';
 };
-
 
 /**
  * Fetches string formula values for a given property name.
@@ -48,16 +47,14 @@ export async function fetchStringFormulaValues(propertyName: (typeof stringFormu
 
   const results = notionDB.results as NotionRes[];
   try {
-      const valueArray = results.map(item => item.properties[propertyName].formula.string);
-      Log.success(`Data fetched successfully for ${propertyName}`, 'fetchStringFormulaValues');
-      return valueArray
+    const valueArray = results.map(item => item.properties[propertyName].formula.string);
+    Log.success(`Data fetched successfully for ${propertyName}`, 'fetchStringFormulaValues');
+    // get unique values from valueArray
+    const uniqueValues = [...new Set(valueArray)];
+    return uniqueValues;
   } catch (error) {
     Log.error(`Error while fetching data for:${propertyName} `, 'fetchStringFormulaValues');
-    console.log(error)
+    console.log(error);
     process.exit(1);
   }
 }
-
-
-
-

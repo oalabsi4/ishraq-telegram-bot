@@ -9,7 +9,7 @@ import { isValidNumber } from '@/api/notion/fetchSelectPropValues.js';
 export async function requestCountMessage(ctx: any) {
   // Send a message to the user requesting the count of the product
   await ctx.reply('type the count of the product');
-  
+
   // Log that the count request message has been sent
   Log.info('Sent count request message', 'requestCountMessage');
 }

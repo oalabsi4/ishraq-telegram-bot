@@ -27,11 +27,9 @@ export async function requestEmployeeKeyboard(ctx: any) {
   Log.info('Sent employee selection keyboard', 'writeToNotionScenes');
 }
 
-
-
 /**
  * Handle the selection of an employee.
- * 
+ *
  * @param ctx - The context object.
  */
 export async function handleEmployeeSelection(ctx: any) {

@@ -1,4 +1,4 @@
-import { Message } from 'telegraf/types';
+import type { Message } from 'telegraf/types';
 
 type RequestsArray = {
   resolve: (message: Message.TextMessage) => void;
@@ -6,7 +6,7 @@ type RequestsArray = {
   id: number;
 };
 const Requests: RequestsArray[] = [];
-export function awaitReply(id: number,timeOut= 10000) {
+export function awaitReply(id: number, timeOut = 10000) {
   const promise = new Promise((resolve, reject) => {
     Requests.push({
       resolve,

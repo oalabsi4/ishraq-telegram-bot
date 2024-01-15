@@ -1,6 +1,6 @@
-import { isValidNumber } from "@/api/notion/fetchSelectPropValues.js";
-import Log from "@utils/logger.js";
-import { dataToWrite } from "./collectedDataFromUser.js";
+import { isValidNumber } from '@/api/notion/fetchSelectPropValues.js';
+import Log from '@utils/logger.js';
+import { dataToWrite } from './collectedDataFromUser.js';
 
 /**
  * Prompts the user to enter the number of pages.
@@ -17,8 +17,6 @@ export async function requestPageCountMessage(ctx: any): Promise<void> {
   Log.info('Sent pages request message', 'getPagesScene');
 }
 
-
-
 /**
  * Handles the user input for page count.
  *
@@ -29,12 +27,7 @@ export async function handlePageCountInput(ctx: any) {
   const userInput = ctx.message.text;
 
   // Check if the user input is valid
-  if (
-    !userInput ||
-    userInput.trim().length === 0 ||
-    !isValidNumber(+userInput) ||
-    +userInput <= 0
-  ) {
+  if (!userInput || userInput.trim().length === 0 || !isValidNumber(+userInput) || +userInput <= 0) {
     // Delete the previous message
     await ctx.deleteMessage(ctx.message.message_id - 1);
     // Delete the current message
@@ -42,10 +35,7 @@ export async function handlePageCountInput(ctx: any) {
     // Reply with an error message
     await ctx.reply('Please enter a valid page count');
     // Log the error
-    Log.warn(
-      `User entered invalid page count ${userInput ?? ''}`,
-      'getPagesScene'
-    );
+    Log.warn(`User entered invalid page count ${userInput ?? ''}`, 'getPagesScene');
     // Re-enter the current scene
     await ctx.scene.reenter();
     // Exit the function

@@ -7,9 +7,6 @@ import path from 'path';
 import type { NotionRes } from '../../types.js';
 import { fileName } from '@utils/fileName.js';
 
-
-
-
 /**
  * Retrieves data from Notion database based on the provided property name and value for a DATE property with date statement and date string.
  *
@@ -21,7 +18,7 @@ import { fileName } from '@utils/fileName.js';
 export async function notionDatePropFilterString(
   propertyName: string,
   propertyValue: string,
-  dateStatement: 'on_or_after' | 'on_or_before' | 'after' | 'before' 
+  dateStatement: 'on_or_after' | 'on_or_before' | 'after' | 'before' | 'equals'
 ) {
   const notion = new Client({
     auth: process.env.notionToken,
@@ -36,13 +33,11 @@ export async function notionDatePropFilterString(
       },
     },
   });
-  const results = await mappingNotionData(data.results as NotionRes[]);
+  const results = mappingNotionData(data.results as NotionRes[]);
   Log.success('Data fetched successfully', 'NotionSelectPropNoDate');
   const filePath = path.join('exported_data', `${fileName(propertyName)}.xlsx`);
   createExcel(filePath, results);
 }
-
-
 
 /**
  * Retrieves data from Notion database based on the provided property name and value for a DATE property with date statement.
@@ -64,7 +59,7 @@ export async function notionDatePropFilterStatement(
     filter: {
       property: propertyName,
       date: {
-        [dateStatement as 'past_year']: {}
+        [dateStatement as 'past_year']: {},
       },
     },
   });

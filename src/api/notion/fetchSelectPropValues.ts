@@ -23,7 +23,7 @@ export function filterPricesFormat(typeName: string, data: NotionPriceListRes[])
     type: e.properties['النوع'].select.name,
     price: e.properties['السعر'].number ?? 0,
     notes: e.properties['ملاحظة'].rich_text?.[0]?.plain_text ?? '',
-    pageID:e.id
+    pageID: e.id,
   }));
 
   return RestructuredData;

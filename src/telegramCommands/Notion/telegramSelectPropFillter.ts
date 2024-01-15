@@ -2,8 +2,8 @@ import Log from '@utils/logger.js';
 import chalk from 'chalk';
 import type { Telegraf } from 'node_modules/telegraf/typings/telegraf.js';
 import { awaitReply } from 'src/api/telegramWaitForResponse.js';
-import { Context } from 'telegraf';
-import { Update } from 'telegraf/types';
+import type { Context } from 'telegraf';
+import type { Update } from 'telegraf/types';
 import {
   notionSelectPropDateStatement,
   notionSelectPropDateString,
@@ -82,7 +82,6 @@ export async function TelegramSelectPropertyFilter(
             const propName =
               filterType === 'ClientWithDate' ? 'العميل' : filterType === 'EmployeeWithDate' ? 'الموظف المنتج' : 'error';
             await sendTelegramFile(ctx, propName, `Data for ${filterType} ${propValue} and ${dateFilterType} 😃`);
-            
           } else {
             await ctx.reply(`Wrong date format: ${chalk.magenta(date)}\n😈 START OVER`);
             Log.warn(`The user entered a wrong date format: ${chalk.magenta(date)}\n😈 START OVER`, 'TelegramPropertyFilter');

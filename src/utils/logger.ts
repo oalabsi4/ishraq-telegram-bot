@@ -22,7 +22,7 @@ Log.error = function (text: string, trace = '') {
   format(title, text, trace, 'red');
 };
 Log.success = function (text: string, trace = '') {
-    const title = chalk.bold.green.inverse('   SUCCESS   ');
+  const title = chalk.bold.green.inverse('   SUCCESS   ');
   format(title, text, trace, 'green');
 };
 

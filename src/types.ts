@@ -1,4 +1,4 @@
-import { Scenes } from "telegraf";
+import type { Scenes } from 'telegraf';
 
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {
@@ -15,8 +15,8 @@ declare global {
   }
 }
 export type Scenetype = Scenes.BaseScene<Scenes.SceneContext>;
-
-export type NotionRes <T extends NotionProps | NotionPriceListProps = NotionProps>  = {
+export type CTX = Scenes.SceneContext<Scenes.SceneSessionData>;
+export type NotionRes<T extends NotionProps | NotionPriceListProps = NotionProps> = {
   object: string;
   id: string;
   created_time: string;
@@ -86,13 +86,13 @@ export type RestructuredData = {
 
 export type PriceListRestructuredData = {
   code: string;
-  description:string
-  type:string
-  price:number
-  metric:string
-  notes:string
-  pageID:string
-}
+  description: string;
+  type: string;
+  price: number;
+  metric: string;
+  notes: string;
+  pageID: string;
+};
 export type CacheType = {
   priceList: {
     data: NotionPriceListRes[] | null;
@@ -103,11 +103,12 @@ export type CacheType = {
     time: number;
   };
   chooseTypeKeyboard: {
-    data: | {
-      text: string;
-      callback_data: string;
-    }[][]
-    | null;
+    data:
+      | {
+          text: string;
+          callback_data: string;
+        }[][]
+      | null;
     time: number;
   };
   clientsToSelectFrom: {
@@ -119,19 +120,21 @@ export type CacheType = {
     time: number;
   };
   clientsKeyboard: {
-    data: | {
-      text: string;
-      callback_data: string;
-    }[][]
-    | null;
+    data:
+      | {
+          text: string;
+          callback_data: string;
+        }[][]
+      | null;
     time: number;
   };
   employeesKeyboard: {
-    data: | {
-      text: string;
-      callback_data: string;
-    }[][]
-    | null;
+    data:
+      | {
+          text: string;
+          callback_data: string;
+        }[][]
+      | null;
     time: number;
   };
 };
@@ -139,16 +142,13 @@ export type TeleggramInlineKeyboard = {
   text: string;
   callback_data: string;
 }[][];
-export type NotionPriceListProps = Record<'الرمز', NotionText>&
-Record<'الشرح', NotionTitle>&
-Record<'النوع',NotionSelect>&
-Record<'السعر',NotionNumber>&
-Record<'وحدة القياس', NotionSelect>&
-Record<'ملاحظة', NotionText>&
-Record<'KMK-PRICING',NotionRelation>
-
-
-
+export type NotionPriceListProps = Record<'الرمز', NotionText> &
+  Record<'الشرح', NotionTitle> &
+  Record<'النوع', NotionSelect> &
+  Record<'السعر', NotionNumber> &
+  Record<'وحدة القياس', NotionSelect> &
+  Record<'ملاحظة', NotionText> &
+  Record<'KMK-PRICING', NotionRelation>;
 
 type NotionSelect = {
   id: string;

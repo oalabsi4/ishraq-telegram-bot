@@ -1,5 +1,5 @@
-import Log from "@utils/logger.js";
-import { PriceListDataCache, dataToWrite } from "./collectedDataFromUser.js";
+import Log from '@utils/logger.js';
+import { PriceListDataCache, dataToWrite } from './collectedDataFromUser.js';
 
 export async function clientListKeyboard(ctx: any) {
   const Loading = await ctx.reply('Loading...');
@@ -12,11 +12,9 @@ export async function clientListKeyboard(ctx: any) {
   Log.info('Sent client selection keyboard', 'clientListKeyboard');
 }
 
-
-
 /**
  * Handles the client selection process.
- * 
+ *
  * @param ctx - The context object containing information about the current session.
  */
 export async function handleClientSelection(ctx: any) {
@@ -44,7 +42,7 @@ export async function handleClientSelection(ctx: any) {
   }
 
   // Get the list of clients to select from
-  const clientsToSelectFrom = await PriceListDataCache.getClientsToSelectFrom() as string[];
+  const clientsToSelectFrom = (await PriceListDataCache.getClientsToSelectFrom()) as string[];
 
   // If userChoice is in the list of clients, update the selected client,
   // delete the message, send a message with the selected client,

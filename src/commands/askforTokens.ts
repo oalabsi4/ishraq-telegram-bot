@@ -1,7 +1,7 @@
 import inquirer from 'inquirer';
 
 export default async function askForNotionToken() {
-  type answersT = { NotionToken: string ,askForDatabaseId: string};
+  type answersT = { NotionToken: string; askForDatabaseId: string };
 
   // ❔ Ask for user input.
   const answers = await inquirer.prompt<answersT>([

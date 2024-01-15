@@ -1,6 +1,6 @@
 import type { Telegraf } from 'node_modules/telegraf/typings/telegraf.js';
-import { Context } from 'telegraf';
-import { Update } from 'telegraf/types';
+import type { Context } from 'telegraf';
+import type { Update } from 'telegraf/types';
 import Log from '@utils/logger.js';
 import chalk from 'chalk';
 import { notionDatePropFilterStatement, notionDatePropFilterString } from '../../api/notion/notionDateFilter.js';

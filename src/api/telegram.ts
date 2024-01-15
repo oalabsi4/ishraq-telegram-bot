@@ -1,8 +1,8 @@
 import { Scenes, session, Telegraf } from 'telegraf';
 import { writeToNotionScenes } from '@/telegramCommands/writeToNotionScenes/handleWriteRequest.js';
+import { handleExportFromNotionDB } from '@/telegramCommands/exportFromNotionScenes/handleExportRequest.js';
 
 export function telegram() {
-
   //* write to notion scenes
   const {
     getPartnerScene,
@@ -33,7 +33,28 @@ export function telegram() {
     getLinkScene: new Scenes.BaseScene<Scenes.SceneContext>('getLink'),
     runNotionWriteFunctionScene: new Scenes.BaseScene<Scenes.SceneContext>('runNotionWriteFunctionScene'),
   };
-
+  //* Export data from Notion scenes
+  const {
+    getFilterPropertyNameScene,
+    getPartnerNameScene,
+    getClientNameScene,
+    getEmployeeNameScene,
+    getTypeNameScene,
+    checkForDateFilter,
+    getDateType,
+    getDateString,
+    tryRunExportFunction,
+  } = {
+    getFilterPropertyNameScene: new Scenes.BaseScene<Scenes.SceneContext>('getFilterPropertyNameScene'),
+    getPartnerNameScene: new Scenes.BaseScene<Scenes.SceneContext>('getPartnerNameScene'),
+    getClientNameScene: new Scenes.BaseScene<Scenes.SceneContext>('getClientNameScene'),
+    getEmployeeNameScene: new Scenes.BaseScene<Scenes.SceneContext>('getEmployeeNameScene'),
+    getTypeNameScene: new Scenes.BaseScene<Scenes.SceneContext>('getTypeNameScene'),
+    checkForDateFilter: new Scenes.BaseScene<Scenes.SceneContext>('checkForDateFilter'),
+    getDateString: new Scenes.BaseScene<Scenes.SceneContext>('getDateString'),
+    getDateType: new Scenes.BaseScene<Scenes.SceneContext>('getDateType'),
+    tryRunExportFunction: new Scenes.BaseScene<Scenes.SceneContext>('tryRunExportFunction'),
+  };
   writeToNotionScenes(
     getPartnerScene,
     getCodeScene,
@@ -49,10 +70,21 @@ export function telegram() {
     getLinkScene,
     runNotionWriteFunctionScene
   );
-
+  handleExportFromNotionDB(
+    getFilterPropertyNameScene,
+    getPartnerNameScene,
+    getClientNameScene,
+    getEmployeeNameScene,
+    getTypeNameScene,
+    checkForDateFilter,
+    getDateString,
+    getDateType,
+    tryRunExportFunction
+  );
   const bot = new Telegraf<Scenes.SceneContext>(process.env.telegramBotToken);
   const stage = new Scenes.Stage<Scenes.SceneContext>(
     [
+      // write to notion scenes
       getPartnerScene,
       getTypeScene,
       getCodeScene,
@@ -66,6 +98,16 @@ export function telegram() {
       getManualPriceScene,
       runNotionWriteFunctionScene,
       getLinkScene,
+      // Export data from Notion scenes
+      getFilterPropertyNameScene,
+      getPartnerNameScene,
+      getClientNameScene,
+      getEmployeeNameScene,
+      getTypeNameScene,
+      checkForDateFilter,
+      getDateString,
+      getDateType,
+      tryRunExportFunction,
     ],
     {
       ttl: 100,
@@ -78,6 +120,7 @@ export function telegram() {
     await ctx.reply('Welcome!');
   });
   bot.command('w', ctx => ctx.scene.enter('getPartner'));
+  bot.command('a', ctx => ctx.scene.enter('getFilterPropertyNameScene'));
   // bot.command('commands', async ctx => {
   //   const isAuthCheck = await authCheck(ctx);
   //   if (!isAuthCheck) return;

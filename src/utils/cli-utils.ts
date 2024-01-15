@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import type { ZodType, SafeParseReturnType } from 'zod';

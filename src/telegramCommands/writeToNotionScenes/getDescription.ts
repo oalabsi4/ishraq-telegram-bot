@@ -14,15 +14,13 @@ export async function requestDescriptionMessage(ctx: any): Promise<void> {
   Log.info('Requested description from user', 'getDescriptionScene');
 }
 
-
-
 /**
  * Handles the user input for the description and performs necessary actions.
  * @param ctx - The context object containing information about the message and scene.
  */
 export async function handleDescriptionInput(ctx: any) {
   const userInput = ctx.message.text;
-  
+
   // Check if user input is empty or too short
   if (!userInput || userInput.length < 3) {
     // Delete previous and current messages
@@ -37,7 +35,7 @@ export async function handleDescriptionInput(ctx: any) {
 
     // Re-enter the scene
     await ctx.scene.reenter();
-    
+
     return;
   }
 

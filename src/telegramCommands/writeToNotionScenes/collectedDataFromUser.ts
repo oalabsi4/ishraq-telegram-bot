@@ -1,6 +1,6 @@
 import { fetchPricesData, selectPropValues } from '@/api/notion/fetchSelectPropValues.js';
 import { exportNotionSelectPropertyValues } from '@/api/notion/notionSelectFilter.js';
-import { CacheType, PriceListRestructuredData } from '@/types.js';
+import type { CacheType, PriceListRestructuredData } from '@/types.js';
 import { formatTelegramKeyboard } from '@utils/telegramkeyboardFormater.js';
 
 export const dataToWrite = {
@@ -18,10 +18,9 @@ export const dataToWrite = {
   partnerSelection: 'KMK' as 'KMK' | 'QYAM' | 'UNKNOWN',
   priceStructuredData: [] as PriceListRestructuredData[],
   selectedType: '',
-  filteredResults: null as PriceListRestructuredData | null
+  filteredResults: null as PriceListRestructuredData | null,
 };
 export const dateRegex = /(20[0-9]{2})\s*-\s*(10|11|12|0[1-9])\s*-\s*(3[0-1]|2[0-9]|1[0-9]|0[1-9])\s*$/; //ex: 2022-01-01 (with zeros)
-
 
 const cache: CacheType = {
   priceList: { data: null, time: 0 },
@@ -91,6 +90,3 @@ export const PriceListDataCache = {
     return cache.employeesKeyboard.data;
   },
 };
-
-
-  

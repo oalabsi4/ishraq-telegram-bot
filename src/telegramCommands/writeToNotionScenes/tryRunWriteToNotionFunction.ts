@@ -1,11 +1,10 @@
-import { writePageToBillDB } from "@/api/notion/writePagetoBillDB.js";
-import Log from "@utils/logger.js";
-import { dataToWrite } from "./collectedDataFromUser.js";
-
+import Log from '@utils/logger.js';
+import { dataToWrite } from './collectedDataFromUser.js';
+import { writePageToBillDB } from '@/api/notion/writePageToBillDB.js';
 
 /**
  * Runs the "writePageToBillDB" function with the provided data and handles the result.
- * 
+ *
  * @param ctx The context object
  */
 export async function tryRunNotionWrite(ctx: any) {
@@ -35,7 +34,7 @@ export async function tryRunNotionWrite(ctx: any) {
 
     // Reply with success message
     await ctx.reply('done');
-    
+
     // Log the success
     Log.success(`Write to notion DB succeeded`, 'runNotionWriteFunctionScene');
 
@@ -53,7 +52,7 @@ export async function tryRunNotionWrite(ctx: any) {
 
     // Leave the scene
     await ctx.scene.leave();
-    
+
     return;
   }
 }

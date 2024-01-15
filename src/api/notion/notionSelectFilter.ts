@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import { QueryDatabaseResponse } from '@notionhq/client/build/src/api-endpoints.js';
+import type { QueryDatabaseResponse } from '@notionhq/client/build/src/api-endpoints.js';
 import { createExcel } from '@utils/Json2cvs.js';
 import path from 'path';
 import type { NotionRes, TeleggramInlineKeyboard } from '../../types.js';
@@ -24,14 +24,13 @@ export async function fetchNotionData<T = NotionRes>(dataBaseId: string) {
   return notionDB.results as T[];
 }
 
-
 /**
  * Generates a Notion property array based on the specified type.
  *
  * @param type - The type of Notion property array to generate. Valid values are: 'clients', 'partners', 'employees'.
  * @return  The generated Notion property array.
  */
-export async function exportNotionSelectPropertyValues(type: 'clients' | 'partners' | 'employees',array=false) {
+export async function exportNotionSelectPropertyValues(type: 'clients' | 'partners' | 'employees', array = false) {
   const rows = await fetchNotionData(process.env.dataBaseId);
 
   try {
@@ -61,7 +60,8 @@ export async function exportNotionSelectPropertyValues(type: 'clients' | 'partne
     return array ? uniquePropertyArray : notionProperty;
   } catch (error) {
     console.log(error);
-    if(!array)return [[{ text: 'No_data', callback_data: 'NO_DATA' }], [{ text: 'back', callback_data: 'back_to_main_export' }]];
+    if (!array)
+      return [[{ text: 'No_data', callback_data: 'NO_DATA' }], [{ text: 'back', callback_data: 'back_to_main_export' }]];
     else return [[{ text: 'back', callback_data: 'cancel' }]];
   }
 }

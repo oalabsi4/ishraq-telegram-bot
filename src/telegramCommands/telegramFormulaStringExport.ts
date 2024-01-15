@@ -1,9 +1,9 @@
-import { Context, Telegraf } from 'telegraf';
-import { Update } from 'telegraf/types';
+import type { Context, Telegraf } from 'telegraf';
+import type { Update } from 'telegraf/types';
 import { dateSelectionKeyboard } from './Notion/dateSelectionKeyboard.js';
 import { notionStringFormulaFilter } from '../api/notion/notionFormulaFilter.js';
 import { sendTelegramFile } from '../api/telegramSendFile.js';
-import { stringFormulasKeys } from '../api/notion/notionFormulaFetch.js';
+import type { stringFormulasKeys } from '../api/notion/notionFormulaFetch.js';
 import { awaitReply } from '../api/telegramWaitForResponse.js';
 import Log from '@utils/logger.js';
 
@@ -43,7 +43,6 @@ async function handleFormulaNoDate(ctx: Context<Update>, propName: FormulaString
   // Send the data
   await sendTelegramFile(ctx, propName, `Data for ${propName} ${propValue}`);
 }
-
 
 async function handleFormulaWithDataStatement(
   ctx: Context<Update>,
