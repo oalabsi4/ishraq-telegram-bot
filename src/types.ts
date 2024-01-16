@@ -11,6 +11,9 @@ declare global {
       kmkPricesId: string;
       qyamPricesId: string;
       unknowPrisesId: string;
+      TrelloApiKey:string
+      TrelloSecret:string
+      TrelloApiToken:string
     }
   }
 }

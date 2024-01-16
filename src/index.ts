@@ -2,7 +2,8 @@
 
 import env from 'dotenv';
 import gradient from 'gradient-string';
-import { telegram } from './api/telegram.js';
+import { telegram } from './api/telegram/telegram.js';
+import { getBoardsIds } from './api/trello/trello.js';
 env.config();
 // ? 👇 title text gradient colors. for more colors see: `https://cssgradient.io/gradient-backgrounds`
 const coolGradient = gradient([
@@ -33,7 +34,8 @@ console.log(
 
 async function app() {
   await telegram();
-  // await writePagetoBillDB(process.env.dataBaseId);
+  // await getBoardsIds()
+ 
 }
 
 app(); // 🚀 Start the app.

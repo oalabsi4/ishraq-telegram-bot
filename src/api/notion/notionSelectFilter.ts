@@ -150,7 +150,7 @@ export async function notionSelectPropDateString(
   propertyname: string,
   propertyValue: string,
   dateString: string,
-  dateStatement: 'on_or_after' | 'on_or_before' | 'after' | 'before'
+  dateStatement: 'on_or_after' | 'on_or_before' | 'after' | 'before' | 'equals'
 ) {
   const notion = new Client({
     auth: process.env.notionToken,

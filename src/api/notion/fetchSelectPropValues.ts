@@ -8,7 +8,7 @@ export async function fetchPricesData(dateBase: 'KMK' | 'QYAM' | 'UNKNOWN') {
 }
 
 export function selectPropValues(data: NotionPriceListRes[]) {
-  const formattedData = data.map(e => e.properties['النوع'].select.name);
+  const formattedData = data.map(e => e.properties['النوع'].select?.name ?? 'EMPTY');
   // remove duplicates
   const uniquePropertyArray = Array.from(new Set(formattedData));
   return uniquePropertyArray;
