@@ -5,7 +5,7 @@ import Log from '@utils/logger.js';
 import { sleep } from '@utils/cli-utils.js';
 
 export async function displayMMembersKeyboard(ctx: CTX) {
-  cardData.idMembers = []
+  cardData.idMembers = [];
   await ctx.deleteMessage();
   const memberKeyboardValues = (await dataFromTrello.getBoardMembers()).map(e => {
     return [
@@ -28,8 +28,7 @@ export async function displayMMembersKeyboard(ctx: CTX) {
         [{ text: Arabic.Done, callback_data: 'Done' }],
         [{ text: Arabic.Cancel, callback_data: 'Cancel' }],
       ],
-      
-    }, 
+    },
   });
   Log.info('sent member selection keyboard', 'displayMMembersKeyboard');
   ctx.scene.current?.action(
@@ -54,7 +53,7 @@ export async function handleMembersSelection(ctx: any, messageId: number) {
     await ctx.deleteMessage();
     await ctx.reply(Arabic.ItsCanceled);
     Log.info('User canceled the selection', 'handleMembersSelection');
-    await ctx.scene.leave(); 
+    await ctx.scene.leave();
     return;
   }
   // increment the counter
@@ -63,7 +62,7 @@ export async function handleMembersSelection(ctx: any, messageId: number) {
     const added = await ctx.reply(Arabic.AddedMember);
     await sleep(500);
     await ctx.deleteMessage(added.message_id);
-    Log.info(`user added employee ${userInput }`, 'handleMembersSelection');
+    Log.info(`user added employee ${userInput}`, 'handleMembersSelection');
     return;
   }
   if (userInput === 'Done') {

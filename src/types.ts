@@ -11,9 +11,9 @@ declare global {
       kmkPricesId: string;
       qyamPricesId: string;
       unknowPrisesId: string;
-      TRELLO_API_TOKEN:string;
-      TRELLO_API_KEY:string;
-      TRELLO_SECRET:string;
+      TRELLO_API_TOKEN: string;
+      TRELLO_API_KEY: string;
+      TRELLO_SECRET: string;
     }
   }
 }

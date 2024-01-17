@@ -46,12 +46,12 @@ export async function cardTitle(ctx: CTX) {
     }
     await ctx.deleteMessage(ctx.message.message_id - 1);
     await ctx.deleteMessage(ctx.message.message_id);
-    // Store the user's input in the cardData object 
+    // Store the user's input in the cardData object
     cardData.name = userInput;
 
     // Log the user's input and transition to the 'getDescription' scene
     Log.info(`User entered ${userInput}`, 'getCardTitle');
-    await ctx.scene.enter('getDescription');
+    await ctx.scene.enter('getCardDescription');
     return;
   });
 }

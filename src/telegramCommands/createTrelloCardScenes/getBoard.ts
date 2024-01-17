@@ -10,24 +10,33 @@ import { cardData, fetchData } from './cardData.js';
  * @returns  - A promise that resolves when the keyboard is displayed.
  */
 export async function displayBoardKeyboard(ctx: CTX) {
-    // Reply with the message and keyboard options
-    await ctx.reply(Arabic.ChoseBoard, {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: Boards.DesignBoard.name, callback_data: `${Boards.DesignBoard.boardId}-${Boards.DesignBoard.lists.id}` }],
-          [{ text: Boards.VideoBoard.name, callback_data: `${Boards.VideoBoard.boardId}-${Boards.VideoBoard.lists.id}` }],
-          [{ text: Boards.MarketingBoard.name, callback_data: `${Boards.MarketingBoard.boardId}-${Boards.MarketingBoard.lists.id}` }],
-          [{ text: Boards.ManagementBoard.name, callback_data: `${Boards.ManagementBoard.boardId}-${Boards.ManagementBoard.lists.id}` }],
-          [{ text: Boards.TestBoard.name, callback_data: `${Boards.TestBoard.boardId}-${Boards.TestBoard.lists.id}` }],
-          [{ text: Arabic.Cancel, callback_data: 'Cancel' }],
+  // Reply with the message and keyboard options
+  await ctx.reply(Arabic.ChoseBoard, {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: Boards.DesignBoard.name, callback_data: `${Boards.DesignBoard.boardId}-${Boards.DesignBoard.lists.id}` }],
+        [{ text: Boards.VideoBoard.name, callback_data: `${Boards.VideoBoard.boardId}-${Boards.VideoBoard.lists.id}` }],
+        [
+          {
+            text: Boards.MarketingBoard.name,
+            callback_data: `${Boards.MarketingBoard.boardId}-${Boards.MarketingBoard.lists.id}`,
+          },
         ],
-      },
-    });
-  
-    // Log that the board selection keyboard was sent
-    Log.info('sent board selection keyboard', 'displayBoardKeyboard');
-  }
+        [
+          {
+            text: Boards.ManagementBoard.name,
+            callback_data: `${Boards.ManagementBoard.boardId}-${Boards.ManagementBoard.lists.id}`,
+          },
+        ],
+        [{ text: Boards.TestBoard.name, callback_data: `${Boards.TestBoard.boardId}-${Boards.TestBoard.lists.id}` }],
+        [{ text: Arabic.Cancel, callback_data: 'Cancel' }],
+      ],
+    },
+  });
 
+  // Log that the board selection keyboard was sent
+  Log.info('sent board selection keyboard', 'displayBoardKeyboard');
+}
 
 /**
  * Handles the selection of a board by the user.
@@ -74,4 +83,3 @@ export async function handleBoardSelection(ctx: any) {
   // Enter the next scene
   await ctx.scene.enter('getEmployee');
 }
-

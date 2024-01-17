@@ -7,7 +7,7 @@ export async function mistral(prompt: string) {
     Authorization: `Bearer ${mistralToken}`,
   };
   const data = {
-    model: 'mistral-tiny',
+    model: 'mistral-small',
     messages: [
       {
         role: 'user',
@@ -15,9 +15,16 @@ export async function mistral(prompt: string) {
       },
     ],
   };
-  const res = await fetch(mistralUrl, { headers, body: JSON.stringify(data), method: 'post' });
-  const json = (await res.json()) as MistralResponse;
-  return json.choices[0].message.content;
+  try {
+    const res = await fetch(mistralUrl, { headers, body: JSON.stringify(data), method: 'post' });
+    const json = (await res.json()) as MistralResponse;
+
+    console.log(json.choices[0].message.content)
+    return json.choices[0].message.content;
+    
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 type Choices = {

@@ -3,7 +3,8 @@ import { writeToNotionScenes } from '@/telegramCommands/Notion/writeToNotionScen
 import { handleExportFromNotionDB } from '@/telegramCommands/Notion/exportFromNotionScenes/handleExportRequest.js';
 import { authCheck } from '@utils/auth.js';
 import { Arabic } from '@utils/arabicDictionary.js';
-import { handleCreateCardRequest } from '@/telegramCommands/Notion/createTrelloCardScenes/handleCreateCardRequest.js';
+import { handleCreateCardRequest } from '@/telegramCommands/createTrelloCardScenes/handleCreateCardRequest.js';
+import { telegramMistral } from '@/telegramCommands/mistral/mistrlaChatBot.js';
 
 export function telegram() {
   //* write to notion scenes
@@ -61,54 +62,58 @@ export function telegram() {
   };
 
   //* create trello card scenes
-  const { getCardTitle, getBoard, getEmployee, getLabel, getDescription, getDueDate, createTrelloCardScene ,getColorScene} = {
+  const { getCardTitle, getBoard, getEmployee, getLabel, getDescription, getDueDate, createTrelloCardScene, getColorScene } = {
     getCardTitle: new Scenes.BaseScene<Scenes.SceneContext>('getCardTitle'),
     getBoard: new Scenes.BaseScene<Scenes.SceneContext>('getBoard'),
     getEmployee: new Scenes.BaseScene<Scenes.SceneContext>('getEmployee'),
     getLabel: new Scenes.BaseScene<Scenes.SceneContext>('getLabel'),
-    getDescription: new Scenes.BaseScene<Scenes.SceneContext>('getDescription'),
+    getDescription: new Scenes.BaseScene<Scenes.SceneContext>('getCardDescription'),
     getDueDate: new Scenes.BaseScene<Scenes.SceneContext>('getDueDate'),
     createTrelloCardScene: new Scenes.BaseScene<Scenes.SceneContext>('createTrelloCardScene'),
     getColorScene: new Scenes.BaseScene<Scenes.SceneContext>('getColor'),
   };
+  //*mistral
+  const mistralChatScene = new Scenes.BaseScene<Scenes.SceneContext>('mistralChatScene');
+  writeToNotionScenes(
+    getPartnerScene,
+    getCodeScene,
+    getTypeScene,
+    getDateSene,
+    getDescriptionScene,
+    getClientScene,
+    getCountScene,
+    GetDurationScene,
+    getPagesScene,
+    getEmplyeeScene,
+    getManualPriceScene,
+    getLinkScene,
+    runNotionWriteFunctionScene
+  );
+  handleExportFromNotionDB(
+    getFilterPropertyNameScene,
+    getPartnerNameScene,
+    getClientNameScene,
+    getEmployeeNameScene,
+    getTypeNameScene,
+    checkForDateFilter,
+    getDateString,
+    getDateType,
+    tryRunExportFunction
+  );
 
-  // writeToNotionScenes(
-  //   getPartnerScene,
-  //   getCodeScene,
-  //   getTypeScene,
-  //   getDateSene,
-  //   getDescriptionScene,
-  //   getClientScene,
-  //   getCountScene,
-  //   GetDurationScene,
-  //   getPagesScene,
-  //   getEmplyeeScene,
-  //   getManualPriceScene,
-  //   getLinkScene,
-  //   runNotionWriteFunctionScene
-  // );
-  // handleExportFromNotionDB(
-  //   getFilterPropertyNameScene,
-  //   getPartnerNameScene,
-  //   getClientNameScene,
-  //   getEmployeeNameScene,
-  //   getTypeNameScene,
-  //   checkForDateFilter,
-  //   getDateString,
-  //   getDateType,
-  //   tryRunExportFunction
-  // );
+  handleCreateCardRequest(
+    getCardTitle,
+    getBoard,
+    getEmployee,
+    getLabel,
+    getDescription,
+    getDueDate,
+    getColorScene,
+    createTrelloCardScene
+  );
 
-   handleCreateCardRequest(
-getCardTitle,
-getBoard,
-getEmployee,
-getLabel,
-getDescription,
-getDueDate,
-getColorScene,
-createTrelloCardScene
-  )
+  telegramMistral(mistralChatScene);
+
   const bot = new Telegraf<Scenes.SceneContext>(process.env.telegramBotToken);
   const stage = new Scenes.Stage<Scenes.SceneContext>(
     [
@@ -144,7 +149,9 @@ createTrelloCardScene
       getDescription,
       getDueDate,
       createTrelloCardScene,
-      getColorScene
+      getColorScene,
+      //mistral
+      mistralChatScene,
     ],
     {
       ttl: 100,
@@ -175,8 +182,8 @@ createTrelloCardScene
 
   bot.action('export', async ctx => await ctx.scene.enter('getFilterPropertyNameScene'));
   bot.action('createTrelloCard', async ctx => await ctx.scene.enter('getBoard'));
+  bot.command('ai', async ctx => await ctx.scene.enter('mistralChatScene'));
   bot.use(authCheck);
-
   // Start the bot
   bot.launch();
 
