@@ -19,7 +19,7 @@ const outFolder = 'installer',
   nodeVersion = 'latest-v18.x',
   nodeDownloadLink = `https://nodejs.org/dist/${nodeVersion}/win-x64/node.exe`,
   makensis = path.normalize('C:/Program Files (x86)/NSIS/makensis.exe'), // NSIS cli path.
-  includeNodejs = false, // include nodejs in the installer. makes the installer larger in size.
+  includeNodejs = true, // include nodejs in the installer. makes the installer larger in size.
   cleanAfterBuild = false; // 🗑️ remove all files after build except `installer.exe`
 
 (async function () {
@@ -63,6 +63,16 @@ const outFolder = 'installer',
     return;
   }
 
+  // * 🔑 copy env file
+  try {
+    progress = loading('- Copying env file ...');
+    await fs.copyFile('.env', path.normalize(`${outFolder}/.env`));
+    progress('- Env file copied successfully!');
+  } catch (e) {
+    progress('- Error copying env file ...', true);
+    return;
+  }
+
   // * 📦 bundle outJsFile
   try {
     progress = loading('- Bundling JavaScript files ...');
@@ -73,7 +83,7 @@ const outFolder = 'installer',
       target: ['node16'],
       outExtension: { '.js': '.cjs' },
       bundle: true,
-      minify: true,
+      minify: false,
       treeShaking: true,
     });
     progress('- JavaScript files Bundled successfully!');

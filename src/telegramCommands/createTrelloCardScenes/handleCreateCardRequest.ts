@@ -9,7 +9,7 @@ import { cardDescription } from './getDescription.js';
 import { displayMMembersKeyboard } from './getEmployees.js';
 import { getLabels } from './getLabels.js';
 
-export  function handleCreateCardRequest(
+export function handleCreateCardRequest(
   getCardTitle: Scenetype,
   getBoard: Scenetype,
   getEmployee: Scenetype,

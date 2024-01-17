@@ -3,6 +3,8 @@ import type { z } from 'zod';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import type { ZodType, SafeParseReturnType } from 'zod';
+import { realpathSync } from 'fs';
+import path from 'path';
 
 /**
  * - It takes the command line arguments, and returns an object with the arguments as key value pairs.
@@ -192,3 +194,20 @@ export function printHelpMessage(options: Options): void {
     }
   }
 }
+
+export const CONSTANTS = {
+  /** - Get the current platform */
+  platform: process.platform,
+  isWindows: process.platform === 'win32',
+  isMac: process.platform === 'darwin',
+  isLinux: process.platform === 'linux',
+  /** - Check if we are in development mode */
+  isDev: process.env.NODE_ENV === 'development',
+  /** - Get the project root directory full path */
+  get projectRoot() {
+    const scriptPath = realpathSync(process.argv[1]);
+    const suffixesToRemove = ['.dev-server', 'dist'];
+    const pattern = new RegExp(`(${suffixesToRemove.join('|')})$`);
+    return path.dirname(scriptPath).replace(pattern, '');
+  },
+} as const;

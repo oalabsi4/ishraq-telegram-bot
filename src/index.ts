@@ -3,7 +3,12 @@
 import env from 'dotenv';
 import gradient from 'gradient-string';
 import { telegram } from './api/telegram/telegram.js';
-env.config();
+import path from 'path';
+import { CONSTANTS } from '@utils/cli-utils.js';
+
+env.config({
+  path:path.join(CONSTANTS.projectRoot, '.env')
+});
 // ? 👇 title text gradient colors. for more colors see: `https://cssgradient.io/gradient-backgrounds`
 const coolGradient = gradient([
   { color: '#FA8BFF', pos: 0 },

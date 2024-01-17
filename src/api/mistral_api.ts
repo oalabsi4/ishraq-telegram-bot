@@ -19,11 +19,10 @@ export async function mistral(prompt: string) {
     const res = await fetch(mistralUrl, { headers, body: JSON.stringify(data), method: 'post' });
     const json = (await res.json()) as MistralResponse;
 
-    console.log(json.choices[0].message.content)
+    console.log(json.choices[0].message.content);
     return json.choices[0].message.content;
-    
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 
