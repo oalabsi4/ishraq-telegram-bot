@@ -5,10 +5,21 @@ import { Arabic } from '@utils/arabicDictionary.js';
 import type { CTX } from '@/types.js';
 import { sleep } from '@utils/cli-utils.js';
 
+/**
+ * Retrieves the labels for a given context.
+ * @param ctx - The context object.
+ */
 export async function getLabels(ctx: CTX) {
+  // Reset the idLabels property of cardData
   cardData.idLabels = [];
+
+  // Delete the current message
   await ctx.deleteMessage();
+
+  // Retrieve the labels for the board
   const labels = await getBoardLabels(fetchData.BoardId);
+
+  // Create the inline keyboard for labels
   const labelsKeyboard = labels.map(e => {
     return [
       {
@@ -17,11 +28,15 @@ export async function getLabels(ctx: CTX) {
       },
     ];
   });
+
+  // Extract the label IDs from the keyboard
   const labelsIds = labelsKeyboard.flatMap(e => {
     return e.map(n => {
       return n.callback_data;
     });
   });
+
+  // Send a reply with the label selection keyboard
   await ctx.reply(Arabic.ChooseLabel, {
     reply_markup: {
       inline_keyboard: [
@@ -31,8 +46,13 @@ export async function getLabels(ctx: CTX) {
       ],
     },
   });
+
+  // Log the action
   Log.info('Sent Label selection keyboard', 'getLabels');
+
+  // Set the action for label selection
   ctx.scene.current?.action([...labelsIds, 'Cancel', 'Done'], handleLabelSelection);
+
   return;
 }
 

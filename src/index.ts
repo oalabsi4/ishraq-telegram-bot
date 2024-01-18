@@ -19,22 +19,9 @@ const coolGradient = gradient([
 // ? `https://www.kammerl.de/ascii/AsciiSignature.php` 👈 to convert your app's title to ASCII art.
 // ? `https://codebeautify.org/javascript-escape-unescape` 👈 escape your title's string for JavaScript.
 console.log(
-  coolGradient(
-    "        _     _             _       __      _   _             \n  /\\/\\ (_)___| |_ _ __ __ _| |   /\\ \\ \\___ | |_(_) ___  _ __  \n /    \\| / __| __| '__/ _` | |  /  \\/ / _ \\| __| |/ _ \\| '_ \\ \n/ /\\/\\ \\ \\__ \\ |_| | | (_| | | / /\\  / (_) | |_| | (_) | | | |\n\\/    \\/_|___/\\__|_|  \\__,_|_| \\_\\ \\/ \\___/ \\__|_|\\___/|_| |_|\n                                                              \n"
-  )
+  coolGradient(`\n __   ______   __  __   ______   ______   ______       ______   ______   ______ \n/\\ \\ /\\  ___\\ /\\ \\_\\ \\ /\\  == \\ /\\  __ \\ /\\  __ \\     /\\  == \\ /\\  __ \\ /\\__  _\\\n\\ \\ \\\\ \\___  \\\\ \\  __ \\\\ \\  __< \\ \\  __ \\\\ \\ \\/\\_\\    \\ \\  __< \\ \\ \\/\\ \\\\/_/\\ \\/\n \\ \\_\\\\/\\_____\\\\ \\_\\ \\_\\\\ \\_\\ \\_\\\\ \\_\\ \\_\\\\ \\___\\_\\    \\ \\_____\\\\ \\_____\\  \\ \\_\\\n  \\/_/ \\/_____/ \\/_/\\/_/ \\/_/ /_/ \\/_/\\/_/ \\/___/_/     \\/_____/ \\/_____/   \\/_/\n                                                                                `)
 );
 
-// 👇 your expected arguments, used for autocomplete and validation.
-// const arguments_shape = z
-//   .object({
-//     fullName: z.string().optional(), // --full-name="string string"
-//     age: z.number().optional(), // --age=number
-//     help: z.boolean().optional().default(false), // --help=boolean or just --help
-//     h: z.boolean().optional().default(false), // -h
-//     args: z.array(z.string()).optional(), // positional arguments E.g "C:\Program Files (x86)"
-//   })
-// !throw an error on extra keys
-// .strict();
 
 function app() {
   telegram();
