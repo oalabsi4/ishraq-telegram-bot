@@ -1,6 +1,6 @@
 import { Client } from '@notionhq/client';
 import type { QueryDatabaseResponse } from '@notionhq/client/build/src/api-endpoints.js';
-import { createExcel } from '@utils/Json2cvs.js';
+import { createExcel } from '@utils/createExcel.js';
 import path from 'path';
 import type { NotionRes, TeleggramInlineKeyboard } from '../../types.js';
 import Log from '@utils/logger.js';

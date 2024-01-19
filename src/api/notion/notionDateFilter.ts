@@ -1,6 +1,6 @@
 import { Client } from '@notionhq/client';
 import type { QueryDatabaseResponse } from '@notionhq/client/build/src/api-endpoints.js';
-import { createExcel } from '@utils/Json2cvs.js';
+import { createExcel } from '@utils/createExcel.js';
 import Log from '@utils/logger.js';
 import { mappingNotionData } from '@utils/notionDataFormat.js';
 import path from 'path';

@@ -4,7 +4,7 @@ import Log from '@utils/logger.js';
 import type { NotionRes } from '../../types.js';
 import type { stringFormulasKeys } from './notionFormulaFetch.js';
 import { mappingNotionData } from '@utils/notionDataFormat.js';
-import { createExcel } from '@utils/Json2cvs.js';
+import { createExcel } from '@utils/createExcel.js';
 import path from 'path';
 import { fileName } from '@utils/fileName.js';
 
