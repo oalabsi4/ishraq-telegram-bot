@@ -38,5 +38,5 @@ installer
 
 .env
 exported_data
-# userIds.txt
-# pass.txt
+userIds.txt
+pass.txt
