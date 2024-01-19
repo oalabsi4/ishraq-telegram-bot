@@ -165,8 +165,6 @@ export function telegram() {
   // });
 
   bot.start(async ctx => {
-    const isAuthCheck = await authCheck(ctx);
-    if (!isAuthCheck) return;
     await ctx.reply(
       Arabic.ChooseCommand,
       Markup.keyboard([[Arabic.ExportFromNotion], [Arabic.WriteToNotion], [Arabic.CreateCardCommand]])
