@@ -1,4 +1,4 @@
-import { Scenes, session, Telegraf } from 'telegraf';
+import { Markup, Scenes, session, Telegraf } from 'telegraf';
 import { writeToNotionScenes } from '@/telegramCommands/Notion/writeToNotionScenes/handleWriteRequest.js';
 import { handleExportFromNotionDB } from '@/telegramCommands/Notion/exportFromNotionScenes/handleExportRequest.js';
 import { authCheck } from '@utils/auth.js';
@@ -160,29 +160,43 @@ export function telegram() {
 
   bot.use(session());
   bot.use(stage.middleware());
-  bot.start(async ctx => {
-    await ctx.reply('Welcome!');
-  });
+  // bot.start(async ctx => {
+  //   await ctx.reply('Welcome!');
+  // });
 
-  bot.command('commands', async ctx => {
+  bot.start(async ctx => {
     const isAuthCheck = await authCheck(ctx);
     if (!isAuthCheck) return;
-    await ctx.reply(Arabic.ChooseCommand, {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: Arabic.ExportFromNotion, callback_data: 'export' }],
-          [{ text: Arabic.WriteToNotion, callback_data: 'NotionBillReg' }],
-          [{ text: Arabic.CreateCardCommand, callback_data: 'createTrelloCard' }],
-        ],
-      },
-    });
+    await ctx.reply(
+      Arabic.ChooseCommand,
+      Markup.keyboard([[Arabic.ExportFromNotion], [Arabic.WriteToNotion], [Arabic.CreateCardCommand]])
+        .persistent()
+        .resize()
+    );
   });
 
-  bot.action('NotionBillReg', async ctx => await ctx.scene.enter('getPartner'));
+  bot.hears([Arabic.ExportFromNotion, Arabic.WriteToNotion, Arabic.CreateCardCommand], async ctx => {
+    const isAuthCheck = await authCheck(ctx);
+    if (!isAuthCheck) return;
+    const userInput = ctx.match[0];
+    if (userInput === Arabic.ExportFromNotion) {
+      await ctx.scene.enter('getFilterPropertyNameScene');
+    }
+    if (userInput === Arabic.WriteToNotion) {
+      await ctx.scene.enter('getPartnerNameScene');
+    }
+    if (userInput === Arabic.CreateCardCommand) {
+      await ctx.scene.enter('getBoard');
+    }
+    return;
+  });
 
-  bot.action('export', async ctx => await ctx.scene.enter('getFilterPropertyNameScene'));
-  bot.action('createTrelloCard', async ctx => await ctx.scene.enter('getBoard'));
-  bot.command('ai', async ctx => await ctx.scene.enter('mistralChatScene'));
+  bot.command('ai', async ctx => {
+    const isAuthCheck = await authCheck(ctx);
+    if (!isAuthCheck) return;
+    await ctx.scene.enter('mistralChatScene');
+    return;
+  });
   bot.use(authCheck);
   // Start the bot
   bot.launch();

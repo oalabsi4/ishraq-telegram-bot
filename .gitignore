@@ -38,3 +38,5 @@ installer
 
 .env
 exported_data
+userIds.txt
+pass.txt
