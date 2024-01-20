@@ -1,10 +1,12 @@
-import { Markup, Scenes, session, Telegraf } from 'telegraf';
-import { writeToNotionScenes } from '@/telegramCommands/Notion/writeToNotionScenes/handleWriteRequest.js';
-import { handleExportFromNotionDB } from '@/telegramCommands/Notion/exportFromNotionScenes/handleExportRequest.js';
-import { authCheck } from '@utils/auth.js';
-import { Arabic } from '@utils/arabicDictionary.js';
 import { handleCreateCardRequest } from '@/telegramCommands/createTrelloCardScenes/handleCreateCardRequest.js';
 import { telegramMistral } from '@/telegramCommands/mistral/mistrlaChatBot.js';
+import { handleExportFromNotionDB } from '@/telegramCommands/Notion/exportFromNotionScenes/handleExportRequest.js';
+import { writeToNotionScenes } from '@/telegramCommands/Notion/writeToNotionScenes/handleWriteRequest.js';
+import { Arabic } from '@utils/arabicDictionary.js';
+import { authCheck } from '@utils/auth.js';
+import { Markup, Scenes, session, Telegraf } from 'telegraf';
+import { message } from 'telegraf/filters';
+import { imageOCR } from '../ocrAPI/ocr.js';
 
 export function telegram() {
   //* write to notion scenes
@@ -186,6 +188,21 @@ export function telegram() {
     if (userInput === Arabic.CreateCardCommand) {
       await ctx.scene.enter('getBoard');
     }
+    return;
+  });
+
+  //? arabic Image OCR
+  bot.on(message('photo'), async ctx => {
+    const isAuthCheck = await authCheck(ctx);
+    if (!isAuthCheck) return;
+
+    const photo = ctx.message.photo;
+    const photoLink = (await ctx.telegram.getFileLink(photo[1].file_id)).href;
+    if (!photoLink) return;
+    await ctx.sendChatAction('typing');
+    const text = await imageOCR(photoLink);
+    if (!text) return;
+    await ctx.reply(text);
     return;
   });
 

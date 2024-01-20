@@ -14,6 +14,7 @@ declare global {
       TRELLO_API_TOKEN: string;
       TRELLO_API_KEY: string;
       TRELLO_SECRET: string;
+      OCR_API: string;
     }
   }
 }

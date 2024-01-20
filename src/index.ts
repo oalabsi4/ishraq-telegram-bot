@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
+import { CONSTANTS } from '@utils/cli-utils.js';
 import env from 'dotenv';
 import gradient from 'gradient-string';
-import { telegram } from './api/telegram/telegram.js';
 import path from 'path';
-import { CONSTANTS } from '@utils/cli-utils.js';
+import { telegram } from './api/telegram/telegram.js';
 
 env.config({
   path: path.join(CONSTANTS.projectRoot, '.env'),
