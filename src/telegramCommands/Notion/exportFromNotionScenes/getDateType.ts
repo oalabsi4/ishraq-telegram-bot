@@ -24,7 +24,7 @@ export async function handleDateFilterTypeSelection(ctx: any) {
   const userInput = ctx.match[0];
 
   // Check if the user input is valid
-  if (!userInput || !DateTypesArray.includes(userInput)) {
+  if (!userInput || !DateTypesArray.includes(userInput) && userInput !== 'Cancel') {
     // Delete the message
     await ctx.deleteMessage();
     // Reply with an error message
