@@ -23,8 +23,8 @@ export async function handleDateFilterTypeSelection(ctx: any) {
   // Get the user input from the context
   const userInput = ctx.match[0];
 
-  // Check if the user input is valid
-  if (!userInput || !DateTypesArray.includes(userInput)) {
+  // Check if the user input is valid  
+  if (!userInput || !DateTypesArray.includes(userInput) && userInput !== 'Cancel') {
     // Delete the message
     await ctx.deleteMessage();
     // Reply with an error message
@@ -46,6 +46,7 @@ export async function handleDateFilterTypeSelection(ctx: any) {
     Log.info('User canceled the selection', 'handleDateFilterTypeSelection');
     // Leave the scene
     await ctx.scene.leave();
+    return 
   }
 
   // Check if the user input is in the dateTypesNOString array
