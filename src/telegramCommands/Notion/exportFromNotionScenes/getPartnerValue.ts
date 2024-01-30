@@ -75,7 +75,7 @@ export async function handlePartnerSelection(ctx: any) {
   // Send a message confirming the selected partner
   await ctx.reply(`${Arabic.Partner}: ${userInput}`);
   // Log an info message
-  Log.info(`User selected a partner: ${userInput}`, 'handlePartnerSelection');
+  Log.info(`User selected a partner: ${userInput}`, 'handlePartnerSelection - export');
   // Enter the next scene
   await ctx.scene.enter('checkForDateFilter');
   return;

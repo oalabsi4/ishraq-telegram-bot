@@ -10,7 +10,7 @@ import { requestEmployeeKeyboard, handleEmployeeSelection } from './getEmployee.
 import { requestLinkMessage, handleLinkInput } from './getLink.js';
 import { requestManualPriceMessage, handleManualPriceInput } from './getManualPrice.js';
 import { requestPageCountMessage, handlePageCountInput } from './getPageCount.js';
-import { partnerChoiceKeyboard, handlePartnerSelection } from './getPartner.js';
+import { partnerChoiceKeyboard, handlePartnerSelectionWrite } from './getPartner.js';
 import { productCodeSelectionKeyboard, handleProductTypeSelection } from './getType.js';
 import { tryRunNotionWrite } from './tryRunWriteToNotionFunction.js';
 import type { Scenetype } from '@/types.js';
@@ -32,7 +32,7 @@ export async function writeToNotionScenes(
 ) {
   //? get the partner name from the user
   getPartnerScene.enter(partnerChoiceKeyboard);
-  getPartnerScene.action(['KMK', 'QYAM', 'UNKNOWN', 'Cancel'], handlePartnerSelection);
+  getPartnerScene.action(['KMK', 'QYAM', 'UNKNOWN', 'Cancel'], handlePartnerSelectionWrite);
 
   //? get the code from the user
   const ChooseTypeKeyboard = await PriceListDataCache.getChooseTypeKeyboard();

@@ -27,7 +27,7 @@ export async function partnerChoiceKeyboard(ctx: CTX) {
  * Handles partner selection in the given context.
  * @param ctx - The context object.
  */
-export async function handlePartnerSelection(ctx: any) {
+export async function handlePartnerSelectionWrite(ctx: any) {
   // Get the user's choice from the context match
   const choice = ctx.match?.[0] as 'KMK' | 'QYAM' | 'UNKNOWN' | 'Cancel';
 
@@ -54,5 +54,7 @@ export async function handlePartnerSelection(ctx: any) {
     await ctx.reply(Arabic.Error);
     Log.warn('Partner selection not recognized', 'handlePartnerSelection');
     await ctx.scene.reenter();
+    return
   }
+  
 }

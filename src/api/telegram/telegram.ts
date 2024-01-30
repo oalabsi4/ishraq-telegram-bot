@@ -91,17 +91,7 @@ export function telegram() {
     getLinkScene,
     runNotionWriteFunctionScene
   );
-  handleExportFromNotionDB(
-    getFilterPropertyNameScene,
-    getPartnerNameScene,
-    getClientNameScene,
-    getEmployeeNameScene,
-    getTypeNameScene,
-    checkForDateFilter,
-    getDateString,
-    getDateType,
-    tryRunExportFunction
-  );
+
 
   handleCreateCardRequest(
     getCardTitle,
@@ -113,7 +103,18 @@ export function telegram() {
     getColorScene,
     createTrelloCardScene
   );
-
+  
+  handleExportFromNotionDB(
+    getFilterPropertyNameScene,
+    getPartnerNameScene,
+    getClientNameScene,
+    getEmployeeNameScene,
+    getTypeNameScene,
+    checkForDateFilter,
+    getDateString,
+    getDateType,
+    tryRunExportFunction
+  );
   telegramMistral(mistralChatScene);
 
   const bot = new Telegraf<Scenes.SceneContext>(process.env.telegramBotToken);
@@ -181,9 +182,11 @@ export function telegram() {
     const userInput = ctx.match[0];
     if (userInput === Arabic.ExportFromNotion) {
       await ctx.scene.enter('getFilterPropertyNameScene');
+
     }
     if (userInput === Arabic.WriteToNotion) {
-      await ctx.scene.enter('getPartnerNameScene');
+      await ctx.scene.enter('getPartner');
+      console.log('entered write mode')
     }
     if (userInput === Arabic.CreateCardCommand) {
       await ctx.scene.enter('getBoard');
